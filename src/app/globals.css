@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #0b0d0f;
+    --foreground: #f0f3f6;
+    --surface: #111417;
+    --surface-secondary: #161a1d;
+    --border: #22262b;
+    --border-subtle: rgba(255, 255, 255, 0.07);
+    --text-primary: #f0f3f6;
+    --text-secondary: #8b949e;
+    --text-muted: #6e7681;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+  }
+
+  * {
+    border-color: #22262b;
+  }
+
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    background-color: #0b0d0f;
+  }
+
+  body {
+    background-color: #0b0d0f;
+    color: #f0f3f6;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Restrained Fintech Surfaces */
+.fintech-surface {
+  background-color: #111417;
+  border: 1px solid #22262b;
+  border-radius: 12px;
+}
+
+.fintech-surface-hover {
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.fintech-surface-hover:hover {
+  background-color: #161a1d;
+  border-color: #30363d;
+}
+
+/* Subtle Specular Highlight (Linear/Stripe style) */
+.subtle-sheen {
+  position: relative;
+}
+
+.subtle-sheen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  pointer-events: none;
+}
+
+/* Clean Data Table Styles */
+.data-table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  padding: 10px 16px;
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8b949e;
+  border-bottom: 1px solid #22262b;
+  background-color: rgba(17, 20, 23, 0.6);
+  font-weight: 600;
+}
+
+.data-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #f0f3f6;
+}
+
+.data-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Custom Minimalist Dark Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0d0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #22262b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #30363d;
+}
