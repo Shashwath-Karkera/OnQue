@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { OncueBrand } from "@/components/brand/oncue-brand";
+import { SiteFooter } from "@/components/brand/site-footer";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
   Mail,
   Phone,
@@ -11,6 +13,8 @@ import {
   CheckCircle2,
   ArrowRight,
   Shield,
+  MessageSquare,
+  Sparkles,
 } from "lucide-react";
 
 export default function ContactPage() {
@@ -35,9 +39,9 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-[#0B0D0F] text-[#F0F3F6] flex flex-col selection:bg-blue-600/30 selection:text-white">
-      {/* Top Navigation */}
+      {/* 1. Header with Brand & Theme Toggle */}
       <header className="sticky top-0 z-40 w-full border-b border-[#22262B] bg-[#0B0D0F]/90 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <OncueBrand size="md" />
           <nav className="hidden md:flex items-center gap-8 text-sm text-[#8492A6]">
             <Link href="/" className="hover:text-[#F0F3F6] transition-colors">
@@ -53,16 +57,17 @@ export default function ContactPage() {
               Contact
             </Link>
           </nav>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link
               href="/app"
-              className="text-sm font-medium text-[#F0F3F6] hover:text-white transition-colors"
+              className="text-sm font-medium text-[#8492A6] hover:text-[#F0F3F6] transition-colors hidden sm:inline-block"
             >
               Sign In
             </Link>
             <Link
               href="/app"
-              className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-medium transition-colors shadow-sm"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white text-xs sm:text-sm font-medium transition-all shadow-[0_4px_16px_rgba(37,99,235,0.3)]"
             >
               Open Dashboard
             </Link>
@@ -71,34 +76,30 @@ export default function ContactPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-16">
-        <div className="max-w-xl mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#22262B] bg-[#111417] text-xs font-mono text-[#8492A6] mb-4">
-            Direct Contractor Support
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#F0F3F6] mb-3">
-            Get in touch with the ONcue team.
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div className="max-w-2xl mb-12">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#F0F3F6] mb-4 leading-tight">
+            Get in touch with ONcue
           </h1>
-          <p className="text-base text-[#8492A6] leading-relaxed">
-            Have questions about payment intelligence, enterprise billing data
-            sync, or client evaluation? We respond within one business day.
+          <p className="text-sm sm:text-base text-[#8492A6] leading-relaxed">
+            Have questions regarding payment intelligence scoring, custom trade
+            agreements, or integrating billing data? Speak directly with our team.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          {/* Form */}
-          <div className="lg:col-span-7 bg-[#111417] border border-[#22262B] rounded-lg p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Contact Form Card */}
+          <div className="lg:col-span-7 rounded-2xl border border-white/10 bg-gradient-to-b from-[#161B22]/90 to-[#0F1318]/95 p-6 sm:p-8 shadow-xl backdrop-blur-md">
             {submitted ? (
               <div className="py-12 text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-[#10B981]/10 text-[#10B981] flex items-center justify-center mx-auto border border-[#10B981]/20">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/20 shadow-[0_0_24px_rgba(16,185,129,0.2)]">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
                 <h2 className="text-xl font-semibold text-[#F0F3F6]">
-                  Message Received
+                  Inquiry Dispatched Successfully
                 </h2>
-                <p className="text-sm text-[#8492A6] max-w-md mx-auto">
-                  Thank you for reaching out. A senior member of our team will review
-                  your inquiry and respond to <span className="text-[#F0F3F6]">{formData.email}</span> shortly.
+                <p className="text-xs sm:text-sm text-[#8492A6] max-w-md mx-auto leading-relaxed">
+                  Thank you for reaching out. A senior member of our trade operations desk will review your details and respond to <span className="text-[#F0F3F6] font-medium">{formData.email}</span> within 4 business hours.
                 </p>
                 <div className="pt-4">
                   <button
@@ -112,9 +113,9 @@ export default function ContactPage() {
                         message: "",
                       });
                     }}
-                    className="text-xs text-[#3B82F6] hover:underline"
+                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors underline"
                   >
-                    Send another message
+                    Submit another inquiry
                   </button>
                 </div>
               </div>
@@ -133,7 +134,7 @@ export default function ContactPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      className="w-full px-3.5 py-2.5 rounded-md bg-[#0B0D0F] border border-[#22262B] text-sm text-[#F0F3F6] placeholder-[#555E6C] focus:outline-none focus:border-[#3B82F6] transition-colors"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-[#0B0D0F] border border-white/10 text-xs text-[#F0F3F6] placeholder-[#555E6C] focus:outline-none focus:border-blue-500 transition-colors"
                     />
                   </div>
                   <div>
@@ -148,7 +149,7 @@ export default function ContactPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
-                      className="w-full px-3.5 py-2.5 rounded-md bg-[#0B0D0F] border border-[#22262B] text-sm text-[#F0F3F6] placeholder-[#555E6C] focus:outline-none focus:border-[#3B82F6] transition-colors"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-[#0B0D0F] border border-white/10 text-xs text-[#F0F3F6] placeholder-[#555E6C] focus:outline-none focus:border-blue-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -156,7 +157,7 @@ export default function ContactPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-[#A0AEC0] mb-1.5">
-                      Company / Trade Entity
+                      Company Entity
                     </label>
                     <input
                       type="text"
@@ -165,7 +166,7 @@ export default function ContactPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, company: e.target.value })
                       }
-                      className="w-full px-3.5 py-2.5 rounded-md bg-[#0B0D0F] border border-[#22262B] text-sm text-[#F0F3F6] placeholder-[#555E6C] focus:outline-none focus:border-[#3B82F6] transition-colors"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-[#0B0D0F] border border-white/10 text-xs text-[#F0F3F6] placeholder-[#555E6C] focus:outline-none focus:border-blue-500 transition-colors"
                     />
                   </div>
                   <div>
@@ -177,7 +178,7 @@ export default function ContactPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, tradeType: e.target.value })
                       }
-                      className="w-full px-3.5 py-2.5 rounded-md bg-[#0B0D0F] border border-[#22262B] text-sm text-[#F0F3F6] focus:outline-none focus:border-[#3B82F6] transition-colors"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-[#0B0D0F] border border-white/10 text-xs text-[#F0F3F6] focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option>General Contractor</option>
                       <option>Electrical / Plumbing / HVAC</option>
@@ -196,19 +197,19 @@ export default function ContactPage() {
                   <textarea
                     required
                     rows={4}
-                    placeholder="Tell us about your team's volume, invoicing challenges, or specific client verification requirements..."
+                    placeholder="Tell us about your volume, invoicing challenges, or specific client verification requirements..."
                     value={formData.message}
                     onChange={(e) =>
                       setFormData({ ...formData, message: e.target.value })
                     }
-                    className="w-full px-3.5 py-2.5 rounded-md bg-[#0B0D0F] border border-[#22262B] text-sm text-[#F0F3F6] placeholder-[#555E6C] focus:outline-none focus:border-[#3B82F6] transition-colors resize-none"
+                    className="w-full px-3.5 py-2.5 rounded-lg bg-[#0B0D0F] border border-white/10 text-xs text-[#F0F3F6] placeholder-[#555E6C] focus:outline-none focus:border-blue-500 transition-colors resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 px-4 rounded-md bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-50 text-white text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 disabled:opacity-50 text-white text-xs sm:text-sm font-medium transition-all shadow-[0_4px_16px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <span>Submitting inquiry...</span>
@@ -223,96 +224,72 @@ export default function ContactPage() {
             )}
           </div>
 
-          {/* Contact Details & SLA */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="p-6 rounded-lg border border-[#22262B] bg-[#111417] space-y-5">
-              <h3 className="text-sm font-semibold text-[#F0F3F6] uppercase tracking-wider font-mono">
-                Direct Channels
-              </h3>
-
-              <div className="flex items-start gap-3.5 text-sm">
-                <Mail className="w-4 h-4 text-[#3B82F6] mt-0.5 shrink-0" />
-                <div>
-                  <div className="text-xs text-[#8492A6]">Inquiries & Support</div>
-                  <a
-                    href="mailto:support@oncue.io"
-                    className="text-[#F0F3F6] hover:text-[#3B82F6] transition-colors font-mono"
-                  >
-                    support@oncue.io
-                  </a>
-                </div>
+          {/* Right Cards: Contact Channels & Desk SLA */}
+          <div className="lg:col-span-5 space-y-5">
+            <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-[#161B22]/90 to-[#0F1318]/95 p-6 shadow-xl backdrop-blur-md space-y-6">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-blue-400" />
+                <h3 className="text-xs font-semibold text-[#F0F3F6] uppercase tracking-wider font-mono">
+                  Direct Trade Channels
+                </h3>
               </div>
 
-              <div className="flex items-start gap-3.5 text-sm">
-                <Phone className="w-4 h-4 text-[#3B82F6] mt-0.5 shrink-0" />
-                <div>
-                  <div className="text-xs text-[#8492A6]">Contractor Desk</div>
-                  <div className="text-[#F0F3F6] font-mono">+1 (888) 492-ONCUE</div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3.5 text-sm">
-                <MapPin className="w-4 h-4 text-[#3B82F6] mt-0.5 shrink-0" />
-                <div>
-                  <div className="text-xs text-[#8492A6]">Headquarters</div>
-                  <div className="text-[#F0F3F6]">
-                    Bay Street Financial District
-                    <br />
-                    Toronto, ON M5J 2T3, Canada
+              <div className="space-y-4">
+                <div className="flex items-start gap-3.5 text-xs">
+                  <Mail className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                  <div>
+                    <div className="text-[11px] text-[#8492A6]">Inquiries & Accounts</div>
+                    <a
+                      href="mailto:support@oncue.io"
+                      className="text-[#F0F3F6] hover:text-blue-400 transition-colors font-mono font-medium text-xs"
+                    >
+                      support@oncue.io
+                    </a>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-start gap-3.5 text-sm">
-                <Clock className="w-4 h-4 text-[#3B82F6] mt-0.5 shrink-0" />
-                <div>
-                  <div className="text-xs text-[#8492A6]">Response Target</div>
-                  <div className="text-[#F0F3F6]">
-                    Monday – Friday, 8:00 AM – 6:00 PM EST
-                    <div className="text-xs text-[#8492A6] mt-0.5">
+                <div className="flex items-start gap-3.5 text-xs">
+                  <Phone className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                  <div>
+                    <div className="text-[11px] text-[#8492A6]">Contractor Hotline</div>
+                    <div className="text-[#F0F3F6] font-mono font-medium">
+                      +1 (888) 492-ONCUE
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5 text-xs">
+                  <MapPin className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                  <div>
+                    <div className="text-[11px] text-[#8492A6]">Operations Center</div>
+                    <div className="text-[#F0F3F6] leading-relaxed">
+                      Bay Street Financial District
+                      <br />
+                      Toronto, ON M5J 2T3, Canada
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5 text-xs">
+                  <Clock className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                  <div>
+                    <div className="text-[11px] text-[#8492A6]">Support Hours</div>
+                    <div className="text-[#F0F3F6]">
+                      Monday – Friday, 8:00 AM – 6:00 PM EST
+                    </div>
+                    <div className="text-[10px] text-emerald-400 mt-0.5">
                       Submissions reviewed within 4 business hours
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div className="p-6 rounded-lg border border-[#22262B] bg-[#111417]/50 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#F0F3F6]">
-                <Shield className="w-4 h-4 text-[#10B981]" />
-                Zero Commercial Spam Guarantee
-              </div>
-              <p className="text-xs text-[#8492A6] leading-relaxed">
-                We respect trade business owners. We will never sell your email or
-                bombard your inbox with sales automation. Your information is used
-                solely to answer your direct inquiry.
-              </p>
-            </div>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[#22262B] bg-[#0B0D0F] py-10 text-xs text-[#8492A6] mt-auto">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <OncueBrand size="sm" />
-          <div className="flex items-center gap-6">
-            <Link href="/" className="hover:text-[#F0F3F6] transition-colors">
-              Product
-            </Link>
-            <Link href="/about" className="hover:text-[#F0F3F6] transition-colors">
-              About
-            </Link>
-            <Link href="/contact" className="hover:text-[#F0F3F6] transition-colors">
-              Contact
-            </Link>
-            <Link href="/app" className="hover:text-[#F0F3F6] transition-colors">
-              Dashboard
-            </Link>
-          </div>
-          <div>© {new Date().getFullYear()} ONcue Technologies Inc.</div>
-        </div>
-      </footer>
+      {/* 3. Professional Site Footer */}
+      <SiteFooter />
     </div>
   );
 }

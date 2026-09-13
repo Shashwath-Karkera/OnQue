@@ -42,6 +42,7 @@ export const viewport: Viewport = {
 };
 
 import { LogoEntryLoader } from "@/components/brand/logo-entry-loader";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 
 export default function RootLayout({
   children,
@@ -53,8 +54,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#0B0D0F] text-[#F0F3F6] font-sans antialiased selection:bg-blue-600/30 selection:text-white flex flex-col`}
       >
-        <LogoEntryLoader />
-        {children}
+        <ThemeProvider>
+          <LogoEntryLoader />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

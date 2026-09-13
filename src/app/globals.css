@@ -15,12 +15,21 @@
     --accent-hover: #1d4ed8;
   }
 
-  * {
-    border-color: #22262b;
+  html.light {
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --surface: #ffffff;
+    --surface-secondary: #f1f5f9;
+    --border: #e2e8f0;
+    --border-subtle: rgba(0, 0, 0, 0.06);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
   }
 
   html {
-    color-scheme: dark;
     scroll-behavior: smooth;
     background-color: #0b0d0f;
   }
@@ -35,80 +44,160 @@
   }
 }
 
-/* Restrained Fintech Surfaces */
-.fintech-surface {
-  background-color: #111417;
-  border: 1px solid #22262b;
-  border-radius: 12px;
+/* =========================================================================
+   LIGHT MODE COMPREHENSIVE CARD & SURFACE OVERRIDES
+   Ensures cards, sections, tables, sidebars, headers and texts look
+   bright, crisp, and high-contrast in light mode
+   ========================================================================= */
+
+html.light {
+  color-scheme: light;
 }
 
-.fintech-surface-hover {
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+html.light body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
 }
 
-.fintech-surface-hover:hover {
-  background-color: #161a1d;
-  border-color: #30363d;
+/* 1. Main Backgrounds */
+html.light [class*="bg-[#0B0D0F]"],
+html.light [class*="bg-[#07090C]"],
+html.light [class*="bg-[#06080B]"],
+html.light [class*="bg-[#0E1114]"],
+html.light [class*="bg-[#0E1117]"],
+html.light [class*="bg-[#0b0e14]"] {
+  background-color: #f8fafc !important;
 }
 
-/* Subtle Specular Highlight (Linear/Stripe style) */
-.subtle-sheen {
-  position: relative;
+/* 2. Primary Surfaces, Cards & Containers */
+html.light [class*="bg-[#111417]"],
+html.light [class*="bg-[#141820]"],
+html.light [class*="bg-[#161B22]"],
+html.light [class*="bg-[#0A111E]"],
+html.light [class*="bg-[#0A0D12]"],
+html.light [class*="bg-[#0E1218]"] {
+  background-color: #ffffff !important;
 }
 
-.subtle-sheen::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-  pointer-events: none;
+/* 3. Secondary Surfaces & Active Nav Items */
+html.light [class*="bg-[#161A1D]"] {
+  background-color: #f1f5f9 !important;
 }
 
-/* Clean Data Table Styles */
-.data-table {
-  width: 100%;
-  text-align: left;
-  border-collapse: collapse;
+/* 4. Gradients on Cards (Override dark gradient steps to crisp white-to-slate) */
+html.light [class*="from-[#161B22]"],
+html.light [class*="from-[#141820]"],
+html.light [class*="from-[#0F1C2E]"],
+html.light [class*="from-[#1A1215]"],
+html.light [class*="from-[#0E1726]"],
+html.light [class*="from-[#090E17]"] {
+  --tw-gradient-from: #ffffff !important;
+  --tw-gradient-to: #f8fafc !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+  background-color: #ffffff !important;
 }
 
-.data-table th {
-  padding: 10px 16px;
-  font-size: 11px;
-  font-family: var(--font-mono, monospace);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #8b949e;
-  border-bottom: 1px solid #22262b;
-  background-color: rgba(17, 20, 23, 0.6);
-  font-weight: 600;
+html.light [class*="to-[#0F1318]"],
+html.light [class*="to-[#0E1117]"],
+html.light [class*="to-[#0A111E]"],
+html.light [class*="to-[#0F0E13]"],
+html.light [class*="to-[#05080E]"],
+html.light [class*="to-[#0A0D12]"] {
+  --tw-gradient-to: #f8fafc !important;
 }
 
-.data-table td {
-  padding: 14px 16px;
-  font-size: 13px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  color: #f0f3f6;
+/* 5. Special Colored Cards (Problem vs Solution, AI Insights) */
+html.light [class*="from-blue-950"],
+html.light [class*="bg-blue-950"] {
+  background: #eff6ff !important;
 }
 
-.data-table tr:hover td {
-  background-color: rgba(255, 255, 255, 0.02);
+html.light [class*="bg-emerald-950"] {
+  background: #ecfdf5 !important;
 }
 
-/* Custom Minimalist Dark Scrollbar */
+/* 6. Borders */
+html.light [class*="border-[#22262B]"],
+html.light [class*="border-white/10"],
+html.light [class*="border-white/15"],
+html.light [class*="border-white/5"] {
+  border-color: #e2e8f0 !important;
+}
+
+/* 7. Typography (Headings, Body, Muted) */
+html.light [class*="text-[#F0F3F6]"],
+html.light [class*="text-white"]:not(.bg-blue-600 *):not(.bg-gradient-to-r *) {
+  color: #0f172a !important;
+}
+
+html.light [class*="text-[#8492A6]"],
+html.light [class*="text-slate-400"] {
+  color: #475569 !important;
+}
+
+html.light [class*="text-[#A0AEC0]"] {
+  color: #334155 !important;
+}
+
+html.light [class*="text-[#555E6C]"],
+html.light [class*="text-[#6e7681]"],
+html.light [class*="text-slate-500"] {
+  color: #64748b !important;
+}
+
+/* 8. Table Elements in Light Mode */
+html.light table tr.border-b {
+  border-color: #e2e8f0 !important;
+}
+
+html.light table tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+/* 9. Glassmorphism Shadow Adjustment for Light Mode */
+html.light [class*="shadow-lg"],
+html.light [class*="shadow-xl"],
+html.light [class*="shadow-2xl"] {
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* 10. Inputs and Selects in Light Mode */
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #0b0d0f;
+  background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #22262b;
-  border-radius: 4px;
+  border-radius: 9999px;
 }
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #30363d;
+  background: #323842;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

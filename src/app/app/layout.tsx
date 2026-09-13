@@ -21,6 +21,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { OncueBrand } from "@/components/brand/oncue-brand";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const PRIMARY_NAV = [
   { label: "Overview", href: "/app", icon: LayoutDashboard },
@@ -199,22 +200,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Top Right Utilities */}
-            <div className="flex items-center gap-4 text-xs">
+            <div className="flex items-center gap-3 text-xs">
+              <ThemeToggle className="h-8 w-8" />
               <Link
                 href="/app/clients"
-                className="px-3 py-1.5 rounded bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium flex items-center gap-1.5 transition-colors shadow-sm"
+                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium flex items-center gap-1.5 transition-all shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Add Client</span>
+                <span className="hidden sm:inline">Add Client</span>
               </Link>
 
               <Link
                 href="/app/notifications"
-                className="p-1.5 text-[#8492A6] hover:text-[#F0F3F6] relative"
+                className="p-2 text-[#8492A6] hover:text-[#F0F3F6] relative rounded-lg hover:bg-[#161A1D] transition-colors"
                 title="Notifications"
               >
                 <Bell className="w-4 h-4" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] absolute top-1 right-1" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] absolute top-1.5 right-1.5" />
               </Link>
             </div>
           </header>
