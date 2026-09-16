@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -19,6 +19,7 @@ import {
   Search,
   Plus,
   HelpCircle,
+  LogOut,
 } from "lucide-react";
 import { OncueBrand } from "@/components/brand/oncue-brand";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -40,9 +41,45 @@ const SECONDARY_NAV = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [user, setUser] = useState<{
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+    avatar_url?: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
+    router.push("/login");
+    router.refresh();
+  };
+
+  const getInitials = (nameStr: string) => {
+    if (!nameStr) return "ON";
+    const parts = nameStr.trim().split(" ");
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return nameStr.slice(0, 2).toUpperCase();
+  };
 
   const isActive = (href: string) => {
     if (href === "/app") return pathname === "/app";
@@ -54,13 +91,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile Header */}
       <div className="md:hidden h-14 bg-[#111417] border-b border-[#22262B] px-4 flex items-center justify-between sticky top-0 z-40">
         <OncueBrand size="sm" linkHref="/app" />
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 text-[#8492A6] hover:text-[#F0F3F6]"
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleLogout}
+            className="p-1.5 rounded-lg text-[#8492A6] hover:text-rose-400 hover:bg-[#161A1D] transition-colors"
+            title="Log Out"
+            aria-label="Log Out"
+          >
+            <LogOut className="w-4 h-4 text-rose-400" />
+          </button>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-2 text-[#8492A6] hover:text-[#F0F3F6]"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Main Layout Container */}
@@ -125,22 +172,30 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               })}
             </nav>
 
-            {/* User Session Pill */}
-            <div className="pt-2 border-t border-[#22262B] flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-[#161A1D] border border-[#22262B] flex items-center justify-center text-xs font-semibold text-[#F0F3F6]">
-                  SK
+            {/* User Session Pill & Full-Width Logout */}
+            <div className="pt-2 border-t border-[#22262B] space-y-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-amber-500 border border-[#22262B] flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm">
+                  {getInitials(user?.name || "Shashwath K")}
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-medium text-[#F0F3F6] leading-none">
-                    Shashwath K.
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-semibold text-[#F0F3F6] leading-none truncate">
+                    {user?.name || "Shashwath K."}
                   </span>
-                  <span className="text-[10px] text-[#555E6C] mt-0.5">
-                    Pro Contractor
+                  <span className="text-[10px] text-[#8492A6] mt-0.5 truncate">
+                    {user?.email || "contractor@oncue.ai"}
                   </span>
                 </div>
               </div>
-              <div className="w-2 h-2 rounded-full bg-emerald-500" title="Connected" />
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full py-1.5 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 hover:text-rose-200 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Log Out</span>
+              </button>
             </div>
           </div>
         </aside>
@@ -179,6 +234,31 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   );
                 })}
               </nav>
+
+              {/* Mobile Drawer Logout */}
+              <div className="pt-4 border-t border-[#22262B] flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-amber-500 flex items-center justify-center text-xs font-bold text-white">
+                    {getInitials(user?.name || "Shashwath K")}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium text-[#F0F3F6]">
+                      {user?.name || "Shashwath K."}
+                    </span>
+                    <span className="text-[10px] text-[#555E6C]">
+                      {user?.email || "contractor@oncue.ai"}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-medium flex items-center gap-1.5"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Logout</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -218,6 +298,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <Bell className="w-4 h-4" />
                 <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] absolute top-1.5 right-1.5" />
               </Link>
+
+              {/* Prominent Dashboard Log Out Button */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 hover:text-rose-200 font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ml-2"
+                title="Log Out of ONcue"
+              >
+                <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                <span>Log Out</span>
+              </button>
             </div>
           </header>
 

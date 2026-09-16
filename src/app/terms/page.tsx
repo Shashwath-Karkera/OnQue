@@ -74,7 +74,7 @@ const ARTICLES = [
         <p>
           By creating an ONcue account, accessing the dashboard, or utilizing our
           API endpoints, you enter into a legally binding agreement with{" "}
-          <strong className="text-[#F0F3F6]">ONcue Technologies Inc.</strong> on
+          <strong className="text-[#F0F3F6]">ONcue</strong> on
           behalf of yourself and the business entity you represent.
         </p>
         <div className="p-4 rounded-xl border border-white/10 bg-[#0A0D12]">
@@ -291,13 +291,10 @@ export default function TermsOfServicePage() {
       <main className="flex-1">
         {/* 2. Hero Section */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-12 sm:pb-16 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-white/10 bg-[#161B22] text-xs font-mono text-[#8492A6] mb-6 shadow-sm">
-            <Scale className="w-3.5 h-3.5 text-blue-400" />
-            <span>Contractor Master Agreement · Effective September 2026</span>
-          </div>
+
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#F0F3F6] leading-[1.15] mb-6 max-w-4xl mx-auto">
-            Clear, honest terms for professional trades.
+            Clear, honest terms for professional trades
           </h1>
 
           <p className="text-base sm:text-lg text-[#8492A6] leading-relaxed max-w-2xl mx-auto">

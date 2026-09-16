@@ -90,13 +90,15 @@ export function Navbar({ onCheckClientClick }: NavbarProps) {
             <span>41,000+ Invoices Tracked</span>
           </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-slate-300 hover:text-white"
-          >
-            Sign In
-          </Button>
+          <Link href="/login">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-slate-300 hover:text-white"
+            >
+              Sign In
+            </Button>
+          </Link>
 
           <Button
             size="sm"
@@ -166,13 +168,14 @@ export function Navbar({ onCheckClientClick }: NavbarProps) {
           </nav>
 
           <div className="pt-2 border-t border-slate-800/80 flex flex-col gap-2">
-            <Button
-              variant="outline"
-              className="w-full justify-center"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Sign In
-            </Button>
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full">
+              <Button
+                variant="outline"
+                className="w-full justify-center"
+              >
+                Sign In
+              </Button>
+            </Link>
             <Button
               className="w-full justify-center bg-amber-500 text-slate-950 font-bold"
               onClick={() => {

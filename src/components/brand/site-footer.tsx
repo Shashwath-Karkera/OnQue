@@ -104,7 +104,7 @@ export function SiteFooter() {
                     href="/contact"
                     className="text-[#8492A6] hover:text-[#F0F3F6] transition-colors"
                   >
-                    Contact Desk
+                    Contact Us
                   </Link>
                 </li>
                 <li>
@@ -112,7 +112,7 @@ export function SiteFooter() {
                     href="/privacy"
                     className="text-[#8492A6] hover:text-[#F0F3F6] transition-colors"
                   >
-                    Privacy Standard
+                    Privacy Policy
                   </Link>
                 </li>
                 <li>
@@ -120,7 +120,7 @@ export function SiteFooter() {
                     href="/terms"
                     className="text-[#8492A6] hover:text-[#F0F3F6] transition-colors"
                   >
-                    Master Terms
+                    Terms & Services
                   </Link>
                 </li>
               </ul>
@@ -132,7 +132,6 @@ export function SiteFooter() {
                 Headquarters
               </div>
               <div className="text-xs text-[#8492A6] leading-relaxed space-y-1">
-                <div className="text-[#F0F3F6] font-medium">ONcue Technologies Inc.</div>
                 <div>Bay Street Financial District</div>
                 <div>Toronto, ON M5J 2T3</div>
                 <div>Canada</div>
@@ -150,21 +149,6 @@ export function SiteFooter() {
             © 2026 ONcue. All rights reserved.
           </div>
 
-          <div className="flex items-center gap-6">
-            <Link
-              href="/privacy"
-              className="text-[#8492A6] hover:text-[#F0F3F6] transition-colors font-medium"
-            >
-              Privacy Policy
-            </Link>
-            <span className="text-[#22262B]">•</span>
-            <Link
-              href="/terms"
-              className="text-[#8492A6] hover:text-[#F0F3F6] transition-colors font-medium"
-            >
-              Terms of Service
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

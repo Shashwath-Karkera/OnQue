@@ -43,11 +43,7 @@ export function OncueBrand({
           >
             ON<span className="text-[#3B82F6]">cue</span>
           </span>
-          {withBadge && (
-            <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-[#161A1D] text-[#8492A6] border border-[#22262B] leading-none">
-              Intelligence
-            </span>
-          )}
+
         </div>
         {withTagline && (
           <span

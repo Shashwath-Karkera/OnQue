@@ -31,7 +31,7 @@ export function Hero({ onCheckClientClick }: HeroProps) {
             {/* Top Eyebrow Tag */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-6 shadow-sm">
               <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping" />
-              <span>Contractor Payment Intelligence</span>
+
               <span className="text-slate-500">|</span>
               <span className="text-slate-300 font-normal">Pre-Engagement Risk Scoring</span>
             </div>

@@ -71,15 +71,12 @@ export default function LandingPage() {
       <main className="flex-1">
         {/* 2. Hero Section */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-12 sm:pb-16 text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-white/10 bg-[#161B22] text-xs font-mono text-[#8492A6] mb-8 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
-            Payment Intelligence for Contractors & Trades
-          </div>
+
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#F0F3F6] leading-[1.15] mb-6">
             Stop Chasing Payments.
             <br />
-            <span className="text-[#8492A6]">Start Making Smarter Decisions.</span>
+            <span className="text-3xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-[#F0F3F6] leading-[1.15] mb-6">Start Making Smarter Decisions.</span>
           </h1>
 
           <p className="text-base sm:text-lg text-[#8492A6] max-w-2xl mx-auto leading-relaxed mb-10">
@@ -203,21 +200,19 @@ export default function LandingPage() {
               <div className="flex items-center gap-6 border-b border-white/10 text-xs font-medium text-[#8492A6]">
                 <button
                   onClick={() => setActiveTab("summary")}
-                  className={`pb-2 transition-colors ${
-                    activeTab === "summary"
-                      ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
-                      : "hover:text-[#F0F3F6]"
-                  }`}
+                  className={`pb-2 transition-colors ${activeTab === "summary"
+                    ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
+                    : "hover:text-[#F0F3F6]"
+                    }`}
                 >
                   Overview & Intelligence
                 </button>
                 <button
                   onClick={() => setActiveTab("milestones")}
-                  className={`pb-2 transition-colors ${
-                    activeTab === "milestones"
-                      ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
-                      : "hover:text-[#F0F3F6]"
-                  }`}
+                  className={`pb-2 transition-colors ${activeTab === "milestones"
+                    ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
+                    : "hover:text-[#F0F3F6]"
+                    }`}
                 >
                   Recommended Payment Terms
                 </button>
