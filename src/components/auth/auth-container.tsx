@@ -358,9 +358,10 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
         )}
 
         {/* Feedback / Alert Banners */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {errorMessage && (
             <motion.div
+              key="auth-error-banner"
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
@@ -373,6 +374,7 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
 
           {successMessage && (
             <motion.div
+              key="auth-success-banner"
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
@@ -598,6 +600,7 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
         {/* ================================================================= */}
         {step === "otp" && (
           <motion.div
+            key="otp-step-view"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-6"
