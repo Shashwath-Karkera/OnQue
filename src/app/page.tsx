@@ -40,9 +40,6 @@ export default function LandingPage() {
             <a href="#intelligence" className="hover:text-[#F0F3F6] transition-colors">
               Payment Intelligence
             </a>
-            <a href="#recommendations" className="hover:text-[#F0F3F6] transition-colors">
-              Recommendations
-            </a>
             <Link href="/about" className="hover:text-[#F0F3F6] transition-colors">
               About
             </Link>

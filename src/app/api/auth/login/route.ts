@@ -77,7 +77,19 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Verify Password
+    // 4. Check if user is a Google OAuth account with no password set
+    if (user && user.auth_provider === "google" && !user.password_hash) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "This account was registered with Google. Please click 'Continue with Google' to sign in.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 5. Verify Password
     const hasValidPassword =
       user && user.password_hash
         ? await verifyPassword(password, user.password_hash)

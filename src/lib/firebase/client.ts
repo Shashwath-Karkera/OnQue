@@ -9,9 +9,13 @@ import {
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  authDomain:
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+    `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebaseapp.com`,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  storageBucket:
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+    `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.appspot.com`,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
@@ -58,11 +62,13 @@ export async function signInWithGooglePopup(): Promise<{
   const clientAuth = getFirebaseClientAuth();
   if (!clientAuth) {
     throw new Error(
-      "Firebase Google Sign-In is not yet configured. Please add NEXT_PUBLIC_FIREBASE_API_KEY and related credentials in .env.local"
+      "Firebase Google Sign-In is not yet configured. Please ensure NEXT_PUBLIC_FIREBASE_API_KEY and related credentials are set."
     );
   }
 
   const provider = new GoogleAuthProvider();
+  provider.addScope("email");
+  provider.addScope("profile");
   provider.setCustomParameters({ prompt: "select_account" });
 
   const result: UserCredential = await signInWithPopup(clientAuth, provider);

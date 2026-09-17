@@ -143,12 +143,11 @@ export function SiteFooter() {
         {/* Divider */}
         <div className="h-px bg-gradient-to-r from-transparent via-[#22262B] to-transparent" />
 
-        {/* Bottom Bar: Copyright & Clean Legal Routing */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#555E6C]">
-          <div className="font-mono">
-            © 2026 ONcue. All rights reserved.
+        {/* Bottom Bar: Copyright & Trademark Centered */}
+        <div className="flex items-center justify-center text-center text-[11px] text-[#555E6C] py-2">
+          <div className="font-mono tracking-wide">
+            © 2026 ONcue™. All rights reserved.
           </div>
-
         </div>
       </div>
     </footer>

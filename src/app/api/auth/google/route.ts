@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { jwtVerify, createRemoteJWKSet } from "jose";
-import { upsertGoogleUser, writeAuditLog } from "@/lib/auth/user-store";
+import {
+  findUserByEmail,
+  createUser,
+  upsertGoogleUser,
+  writeAuditLog,
+} from "@/lib/auth/user-store";
 import { createSessionToken, setSessionCookie } from "@/lib/auth/session";
 
 // Google's public JSON Web Key Set for Firebase Auth tokens
@@ -17,7 +22,7 @@ export async function POST(request: Request) {
       "127.0.0.1";
     const userAgent = request.headers.get("user-agent") || "";
 
-    const { idToken } = await request.json().catch(() => ({}));
+    const { idToken, action = "login" } = await request.json().catch(() => ({}));
 
     if (!idToken || typeof idToken !== "string") {
       return NextResponse.json(
@@ -25,10 +30,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    let email = "";
-    let name = "";
-    let avatarUrl: string | undefined = undefined;
 
     const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     if (!projectId) {
@@ -41,6 +42,10 @@ export async function POST(request: Request) {
       );
     }
 
+    let email = "";
+    let name = "";
+    let avatarUrl: string | undefined = undefined;
+
     try {
       const { payload } = await jwtVerify(idToken, GOOGLE_JWKS, {
         issuer: `https://securetoken.google.com/${projectId}`,
@@ -48,7 +53,9 @@ export async function POST(request: Request) {
       });
 
       email = (payload.email as string) || "";
-      name = (payload.name as string) || "Google User";
+      name =
+        (payload.name as string) ||
+        (email ? email.split("@")[0] : "Google User");
       avatarUrl = (payload.picture as string) || undefined;
     } catch (err: any) {
       console.error("[Google Token Verification Error]", err.message);
@@ -71,21 +78,101 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Upsert user in NeonDB
+    const existingUser = await findUserByEmail(email);
+
+    // =========================================================================
+    // 1. REGISTRATION FLOW (mode: "register")
+    // =========================================================================
+    if (action === "register") {
+      if (existingUser) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "An account with this Google email already exists. Please sign in instead.",
+          },
+          { status: 409 }
+        );
+      }
+
+      // Create new user in NeonDB
+      const newUser = await createUser({
+        email,
+        name,
+        auth_provider: "google",
+        avatar_url: avatarUrl,
+        is_verified: true,
+        role: "contractor",
+      });
+
+      await writeAuditLog({
+        userId: newUser.id,
+        email: newUser.email,
+        eventType: "GOOGLE_REGISTER_SUCCESS",
+        ipAddress: ip,
+        userAgent,
+      });
+
+      // DO NOT set session cookie! Compulsory login required before accessing dashboard
+      return NextResponse.json({
+        success: true,
+        requiresLogin: true,
+        message:
+          "Account registered successfully! Please sign in with Google to access your dashboard.",
+      });
+    }
+
+    // =========================================================================
+    // 2. LOGIN FLOW (mode: "login")
+    // =========================================================================
+    if (!existingUser) {
+      await writeAuditLog({
+        email,
+        eventType: "GOOGLE_LOGIN_FAILED_NOT_REGISTERED",
+        ipAddress: ip,
+        userAgent,
+      });
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "No account found with this Google email. Please register first.",
+        },
+        { status: 404 }
+      );
+    }
+
+    // Check account lockout
+    if (
+      existingUser.locked_until &&
+      new Date(existingUser.locked_until) > new Date()
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Account temporarily locked due to excessive failed attempts. Please try again later.",
+        },
+        { status: 423 }
+      );
+    }
+
+    // Update user info and ensure is_verified
     const user = await upsertGoogleUser({
       email,
       name,
       avatar_url: avatarUrl,
     });
 
-    // 3. Issue Session Token & Set HttpOnly Cookie
+    // Issue Session Token & Set HttpOnly Cookie
     const sessionToken = await createSessionToken({
       id: user.id,
       email: user.email,
       name: user.name,
       role: user.role,
       avatar_url: user.avatar_url,
-      auth_provider: "google",
+      auth_provider: user.auth_provider,
     });
 
     const response = NextResponse.json({
