@@ -15,7 +15,6 @@ import {
   CheckCircle2,
   AlertCircle,
   RefreshCw,
-  Sparkles,
   ChevronLeft,
 } from "lucide-react";
 import { evaluatePasswordStrength } from "@/lib/auth/security";
@@ -42,7 +41,6 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const otpInputsRef = useRef<(HTMLInputElement | null)[]>([]);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [devCode, setDevCode] = useState<string | null>(null);
 
   // Status & Feedback
   const [isLoading, setIsLoading] = useState(false);
@@ -139,9 +137,6 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
         setStep("otp");
         setResendCooldown(60);
         setSuccessMessage(`A 6-digit verification code has been sent to ${email}`);
-        if (data.devMode) {
-          setDevCode("Code logged in terminal & fallback");
-        }
         setIsLoading(false);
       }
     } catch {
@@ -652,29 +647,7 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
               ))}
             </div>
 
-            {/* Dev Mode quick fill banner if applicable */}
-            {devCode && (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>Dev Mode: Check server terminal for code</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const sample = prompt("Enter 6-digit code printed in terminal:");
-                    if (sample && sample.trim().length === 6) {
-                      const digits = sample.trim().split("");
-                      setOtp(digits);
-                      triggerVerifyOtp(sample.trim());
-                    }
-                  }}
-                  className="text-[11px] underline font-semibold text-amber-400 hover:text-amber-300 cursor-pointer"
-                >
-                  Quick Fill
-                </button>
-              </div>
-            )}
+
 
             {/* Verify CTA */}
             <button

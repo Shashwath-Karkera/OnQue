@@ -120,7 +120,6 @@ export async function POST(request: Request) {
       success: true,
       message: `A 6-digit verification code has been sent to ${email}.`,
       email,
-      devMode: emailResult.devMode,
     });
   } catch (error: any) {
     console.error("[Register API Error]", error);

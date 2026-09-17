@@ -67,7 +67,6 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: `A new verification code has been dispatched to ${email}.`,
-      devMode: emailResult.devMode,
     });
   } catch (error: any) {
     console.error("[Resend OTP API Error]", error);
