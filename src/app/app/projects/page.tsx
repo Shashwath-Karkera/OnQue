@@ -119,11 +119,10 @@ export default function ProjectsListPage() {
                 </td>
                 <td className="py-3.5 px-4">
                   <span
-                    className={`px-2 py-0.5 rounded text-[11px] font-medium border ${
-                      p.status === "Active"
-                        ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                    }`}
+                    className={`px-2 py-0.5 rounded text-[11px] font-medium border ${p.status === "Active"
+                      ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                      : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      }`}
                   >
                     {p.status}
                   </span>

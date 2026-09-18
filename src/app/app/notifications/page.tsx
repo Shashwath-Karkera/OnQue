@@ -77,22 +77,20 @@ export default function NotificationsPage() {
           <Link
             key={item.id}
             href={item.link}
-            className={`p-5 flex items-start justify-between gap-4 hover:bg-[#161A1D] transition-colors group block ${
-              item.unread ? "bg-[#111417]" : "bg-[#0E1114]/50 opacity-90"
-            }`}
+            className={`p-5 flex items-start justify-between gap-4 hover:bg-[#161A1D] transition-colors group block ${item.unread ? "bg-[#111417]" : "bg-[#0E1114]/50 opacity-90"
+              }`}
           >
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span
-                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
-                    item.category === "Payment overdue"
-                      ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                      : item.category === "Payment received"
+                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${item.category === "Payment overdue"
+                    ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                    : item.category === "Payment received"
                       ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                       : item.category === "Client risk changed"
-                      ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                      : "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                  }`}
+                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                        : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                    }`}
                 >
                   {item.category}
                 </span>

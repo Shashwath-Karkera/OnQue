@@ -22,7 +22,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { OncueBrand } from "@/components/brand/oncue-brand";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const PRIMARY_NAV = [
   { label: "Overview", href: "/app", icon: LayoutDashboard },
@@ -61,13 +60,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           setUser(data.user);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
-    } catch {}
+    } catch { }
     router.push("/login");
     router.refresh();
   };
@@ -131,16 +130,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs font-medium transition-colors ${
-                      active
-                        ? "bg-[#161A1D] text-[#F0F3F6] border border-[#22262B] shadow-sm"
-                        : "text-[#8492A6] hover:text-[#F0F3F6] hover:bg-[#161A1D]/50"
-                    }`}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs font-medium transition-colors ${active
+                      ? "bg-[#161A1D] text-[#F0F3F6] border border-[#22262B] shadow-sm"
+                      : "text-[#8492A6] hover:text-[#F0F3F6] hover:bg-[#161A1D]/50"
+                      }`}
                   >
                     <Icon
-                      className={`w-4 h-4 ${
-                        active ? "text-[#3B82F6]" : "text-[#555E6C]"
-                      }`}
+                      className={`w-4 h-4 ${active ? "text-[#3B82F6]" : "text-[#555E6C]"
+                        }`}
                     />
                     <span>{item.label}</span>
                   </Link>
@@ -159,11 +156,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                      active
-                        ? "text-[#F0F3F6] bg-[#161A1D]"
-                        : "text-[#8492A6] hover:text-[#F0F3F6]"
-                    }`}
+                    className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${active
+                      ? "text-[#F0F3F6] bg-[#161A1D]"
+                      : "text-[#8492A6] hover:text-[#F0F3F6]"
+                      }`}
                   >
                     <Icon className="w-3.5 h-3.5 text-[#555E6C]" />
                     <span>{item.label}</span>
@@ -222,11 +218,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       key={item.href}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium ${
-                        active
-                          ? "bg-[#161A1D] text-[#F0F3F6] border border-[#22262B]"
-                          : "text-[#8492A6]"
-                      }`}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium ${active
+                        ? "bg-[#161A1D] text-[#F0F3F6] border border-[#22262B]"
+                        : "text-[#8492A6]"
+                        }`}
                     >
                       <Icon className="w-4 h-4 text-[#3B82F6]" />
                       <span>{item.label}</span>
@@ -275,16 +270,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search clients, invoices, projects... (⌘K)"
-                className="w-full pl-9 pr-3 py-1.5 rounded-md bg-[#111417] border border-[#22262B] text-xs text-[#F0F3F6] placeholder-[#555E6C] focus:outline-none focus:border-[#3B82F6] transition-colors"
+                className="w-full pl-9 pr-3 py-1.5 rounded-md bg-[#0E0E12] border border-white/[0.08] text-xs text-[#F4F4F5] placeholder-zinc-500 focus:outline-none focus:border-white/30 transition-colors"
               />
             </div>
 
             {/* Top Right Utilities */}
             <div className="flex items-center gap-3 text-xs">
-              <ThemeToggle className="h-8 w-8" />
               <Link
                 href="/app/clients"
-                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium flex items-center gap-1.5 transition-all shadow-sm"
+                className="px-3 py-1.5 rounded-lg copper-cta text-white font-medium flex items-center gap-1.5 transition-all shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Add Client</span>

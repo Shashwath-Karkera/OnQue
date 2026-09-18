@@ -311,7 +311,7 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
       if (data.requiresLogin) {
         setSuccessMessage(
           data.message ||
-            "Account registered successfully! Please click 'Continue with Google' to sign in."
+          "Account registered successfully! Please click 'Continue with Google' to sign in."
         );
         setMode("login");
         setStep("form");
@@ -418,15 +418,15 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
             {step === "otp"
               ? "Verify your email"
               : mode === "login"
-              ? "Sign in to ONcue"
-              : "Create your account"}
+                ? "Sign in to ONcue"
+                : "Create your account"}
           </h1>
           <p className="text-xs text-[#8492A6] mt-1">
             {step === "otp"
               ? "Enter the 6-digit code sent to your inbox"
               : mode === "login"
-              ? "Welcome back. Enter your credentials to continue."
-              : "Get started with automated payment intelligence."}
+                ? "Welcome back. Enter your credentials to continue."
+                : "Get started with automated payment intelligence."}
           </p>
         </div>
 
@@ -436,22 +436,20 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
             <button
               type="button"
               onClick={() => handleModeChange("login")}
-              className={`relative flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                mode === "login"
+              className={`relative flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${mode === "login"
                   ? "text-white bg-[#1E232A] shadow-sm"
                   : "text-[#8492A6] hover:text-white"
-              }`}
+                }`}
             >
               Sign In
             </button>
             <button
               type="button"
               onClick={() => handleModeChange("register")}
-              className={`relative flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                mode === "register"
+              className={`relative flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${mode === "register"
                   ? "text-white bg-[#1E232A] shadow-sm"
                   : "text-[#8492A6] hover:text-white"
-              }`}
+                }`}
             >
               Create Account
             </button>
@@ -525,8 +523,8 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
                 {isGoogleLoading
                   ? "Connecting to Google..."
                   : mode === "login"
-                  ? "Continue with Google"
-                  : "Sign up with Google"}
+                    ? "Continue with Google"
+                    : "Sign up with Google"}
               </span>
             </button>
 
@@ -628,13 +626,12 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
                     <div className="flex items-center justify-between text-[11px]">
                       <span className="text-[#8492A6]">Strength</span>
                       <span
-                        className={`font-semibold ${
-                          passwordStrength.score >= 3
+                        className={`font-semibold ${passwordStrength.score >= 3
                             ? "text-emerald-400"
                             : passwordStrength.score === 2
-                            ? "text-amber-400"
-                            : "text-rose-400"
-                        }`}
+                              ? "text-amber-400"
+                              : "text-rose-400"
+                          }`}
                       >
                         {passwordStrength.label}
                       </span>
@@ -644,15 +641,14 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
                       {[1, 2, 3, 4].map((stepIdx) => (
                         <div
                           key={stepIdx}
-                          className={`rounded-full transition-all duration-300 ${
-                            passwordStrength.score >= stepIdx
+                          className={`rounded-full transition-all duration-300 ${passwordStrength.score >= stepIdx
                               ? passwordStrength.score >= 3
                                 ? "bg-emerald-500"
                                 : passwordStrength.score === 2
-                                ? "bg-amber-500"
-                                : "bg-rose-500"
+                                  ? "bg-amber-500"
+                                  : "bg-rose-500"
                               : "bg-[#22262B]"
-                          }`}
+                            }`}
                         />
                       ))}
                     </div>
@@ -660,30 +656,26 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
                     {/* Criteria Checklist */}
                     <div className="grid grid-cols-2 gap-1.5 pt-1 text-[11px] text-[#8492A6]">
                       <span
-                        className={`flex items-center gap-1 ${
-                          passwordStrength.hasLength ? "text-emerald-400" : ""
-                        }`}
+                        className={`flex items-center gap-1 ${passwordStrength.hasLength ? "text-emerald-400" : ""
+                          }`}
                       >
                         • 8+ characters
                       </span>
                       <span
-                        className={`flex items-center gap-1 ${
-                          passwordStrength.hasUpper ? "text-emerald-400" : ""
-                        }`}
+                        className={`flex items-center gap-1 ${passwordStrength.hasUpper ? "text-emerald-400" : ""
+                          }`}
                       >
                         • Uppercase letter
                       </span>
                       <span
-                        className={`flex items-center gap-1 ${
-                          passwordStrength.hasLower ? "text-emerald-400" : ""
-                        }`}
+                        className={`flex items-center gap-1 ${passwordStrength.hasLower ? "text-emerald-400" : ""
+                          }`}
                       >
                         • Lowercase letter
                       </span>
                       <span
-                        className={`flex items-center gap-1 ${
-                          passwordStrength.hasNumber ? "text-emerald-400" : ""
-                        }`}
+                        className={`flex items-center gap-1 ${passwordStrength.hasNumber ? "text-emerald-400" : ""
+                          }`}
                       >
                         • Number or symbol
                       </span>
@@ -823,11 +815,10 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
                 type="button"
                 onClick={handleResendOtp}
                 disabled={resendCooldown > 0 || isLoading}
-                className={`font-semibold transition-colors ${
-                  resendCooldown > 0
+                className={`font-semibold transition-colors ${resendCooldown > 0
                     ? "text-[#555E6C] cursor-not-allowed"
                     : "text-amber-400 hover:underline cursor-pointer"
-                }`}
+                  }`}
               >
                 {resendCooldown > 0
                   ? `Resend in ${resendCooldown}s`

@@ -149,11 +149,10 @@ export default function ProjectDetailPage() {
                     <td className="py-3 px-4 text-[#8492A6]">{m.dueDate}</td>
                     <td className="py-3 px-4 text-right">
                       <span
-                        className={`px-2 py-0.5 rounded text-[11px] font-medium border ${
-                          m.status === "Settled"
+                        className={`px-2 py-0.5 rounded text-[11px] font-medium border ${m.status === "Settled"
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                             : "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                        }`}
+                          }`}
                       >
                         {m.status}
                       </span>

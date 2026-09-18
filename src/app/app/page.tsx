@@ -207,24 +207,22 @@ export default function AppDashboardPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase ${
-                        item.level === "high"
-                          ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                          : item.level === "medium"
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase ${item.level === "high"
+                        ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                        : item.level === "medium"
                           ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                           : "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                      }`}
+                        }`}
                     >
                       {item.tag}
                     </span>
                     <Icon
-                      className={`w-4 h-4 ${
-                        item.level === "high"
-                          ? "text-rose-400"
-                          : item.level === "medium"
+                      className={`w-4 h-4 ${item.level === "high"
+                        ? "text-rose-400"
+                        : item.level === "medium"
                           ? "text-amber-400"
                           : "text-blue-400"
-                      }`}
+                        }`}
                     />
                   </div>
 
@@ -293,13 +291,12 @@ export default function AppDashboardPage() {
                   <td className="py-3.5 px-4 text-[#8492A6]">{row.delay}</td>
                   <td className="py-3.5 px-4 text-right">
                     <span
-                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
-                        row.status === "Paid"
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : row.status === "Pending"
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${row.status === "Paid"
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                        : row.status === "Pending"
                           ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
                           : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                      }`}
+                        }`}
                     >
                       {row.status}
                     </span>

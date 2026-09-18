@@ -54,11 +54,10 @@ export default function SettingsPage() {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id as any)}
-              className={`pb-1 whitespace-nowrap transition-colors ${
-                activeSection === tab.id
-                  ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
-                  : "hover:text-[#F0F3F6]"
-              }`}
+              className={`pb-1 whitespace-nowrap transition-colors ${activeSection === tab.id
+                ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
+                : "hover:text-[#F0F3F6]"
+                }`}
             >
               {tab.label}
             </button>
@@ -90,7 +89,7 @@ export default function SettingsPage() {
                 </label>
                 <input
                   type="email"
-                  defaultValue="shashwath@oncue.io"
+                  defaultValue="onque.connect@gmail.com"
                   className="w-full px-3 py-2 rounded-md bg-[#0B0D0F] border border-[#22262B] text-xs text-[#F0F3F6] focus:outline-none focus:border-[#3B82F6]"
                 />
               </div>

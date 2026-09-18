@@ -147,11 +147,10 @@ export default function InvoicesListPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1 rounded transition-colors ${
-                  activeTab === tab
-                    ? "bg-[#161A1D] text-[#F0F3F6] shadow-xs border border-[#22262B]"
-                    : "text-[#8492A6] hover:text-[#F0F3F6]"
-                }`}
+                className={`px-3 py-1 rounded transition-colors ${activeTab === tab
+                  ? "bg-[#161A1D] text-[#F0F3F6] shadow-xs border border-[#22262B]"
+                  : "text-[#8492A6] hover:text-[#F0F3F6]"
+                  }`}
               >
                 {tab}
               </button>
@@ -206,15 +205,14 @@ export default function InvoicesListPage() {
                 <td className="py-3.5 px-4 text-[#8492A6]">{inv.dueDate}</td>
                 <td className="py-3.5 px-4">
                   <span
-                    className={`px-2 py-0.5 rounded text-[11px] font-medium border ${
-                      inv.status === "Paid"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                        : inv.status === "Pending"
+                    className={`px-2 py-0.5 rounded text-[11px] font-medium border ${inv.status === "Paid"
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      : inv.status === "Pending"
                         ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
                         : inv.status === "Overdue"
-                        ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                        : "bg-slate-500/10 text-slate-400 border-slate-500/20"
-                    }`}
+                          ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                          : "bg-slate-500/10 text-slate-400 border-slate-500/20"
+                      }`}
                   >
                     {inv.status}
                   </span>

@@ -141,7 +141,7 @@ export function LandingCtaAndFooter() {
                   </a>
                 </li>
                 <li>
-                  <a href="mailto:support@oncue.io" className="hover:text-amber-600 transition-colors">
+                  <a href="mailto:onque.connect@gmail.com" className="hover:text-amber-600 transition-colors">
                     Contact
                   </a>
                 </li>

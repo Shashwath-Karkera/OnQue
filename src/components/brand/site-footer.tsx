@@ -126,15 +126,33 @@ export function SiteFooter() {
               </ul>
             </div>
 
-            {/* Column 3: Headquarters Location */}
+            {/* Column 3: Contact & Headquarters */}
             <div className="space-y-3.5 col-span-2 sm:col-span-1">
               <div className="text-xs font-semibold text-[#F0F3F6] uppercase tracking-wider font-mono">
-                Headquarters
+                Contact & HQ
               </div>
               <div className="text-xs text-[#8492A6] leading-relaxed space-y-1">
-                <div>Bay Street Financial District</div>
-                <div>Toronto, ON M5J 2T3</div>
+                <div>9970 124A Street</div>
+                <div>Surrey, British Columbia</div>
                 <div>Canada</div>
+                <div className="pt-2 border-t border-white/5 space-y-1">
+                  <div>
+                    <a
+                      href="mailto:onque.connect@gmail.com"
+                      className="text-[#F0F3F6] hover:text-blue-400 transition-colors font-mono text-[11px]"
+                    >
+                      onque.connect@gmail.com
+                    </a>
+                  </div>
+                  <div>
+                    <a
+                      href="tel:+17789864390"
+                      className="text-[#8492A6] hover:text-[#F0F3F6] transition-colors font-mono text-[11px]"
+                    >
+                      +1 (778) 986-4390
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

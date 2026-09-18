@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { OncueBrand } from "@/components/brand/oncue-brand";
 import { SiteFooter } from "@/components/brand/site-footer";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
   Mail,
   Phone,
@@ -28,48 +27,46 @@ export default function ContactPage() {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-    }, 800);
+    await new Promise((r) => setTimeout(r, 600));
+    setLoading(false);
+    setSubmitted(true);
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0D0F] text-[#F0F3F6] flex flex-col selection:bg-blue-600/30 selection:text-white">
-      {/* 1. Header with Brand & Theme Toggle */}
-      <header className="sticky top-0 z-40 w-full border-b border-[#22262B] bg-[#0B0D0F]/90 backdrop-blur-md">
+    <div className="min-h-screen bg-[#070708] text-[#F4F4F5] flex flex-col selection:bg-[#F95721]/30 selection:text-white">
+      {/* 1. Header Navigation */}
+      <header className="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#070708]/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <OncueBrand size="md" />
-          <nav className="hidden md:flex items-center gap-8 text-sm text-[#8492A6]">
-            <Link href="/" className="hover:text-[#F0F3F6] transition-colors">
+          <nav className="hidden md:flex items-center gap-8 text-sm text-[#A1A1AA]">
+            <Link href="/" className="hover:text-[#F4F4F5] transition-colors">
               Product
             </Link>
-            <Link href="/about" className="hover:text-[#F0F3F6] transition-colors">
+            <Link href="/about" className="hover:text-[#F4F4F5] transition-colors">
               About
             </Link>
             <Link
               href="/contact"
-              className="text-[#F0F3F6] font-medium transition-colors"
+              className="text-[#F4F4F5] font-medium transition-colors"
             >
               Contact
             </Link>
           </nav>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <Link
               href="/app"
-              className="text-sm font-medium text-[#8492A6] hover:text-[#F0F3F6] transition-colors hidden sm:inline-block"
+              className="text-sm font-medium text-[#A1A1AA] hover:text-[#F4F4F5] transition-colors px-3 py-1.5"
             >
               Sign In
             </Link>
             <Link
               href="/app"
-              className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white text-xs sm:text-sm font-medium transition-all shadow-[0_4px_16px_rgba(37,99,235,0.3)]"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg copper-cta text-white text-xs sm:text-sm font-medium transition-all shadow-sm"
             >
-              Open Dashboard
+              Start Free
             </Link>
           </div>
         </div>
@@ -240,10 +237,10 @@ export default function ContactPage() {
                   <div>
                     <div className="text-[11px] text-[#8492A6]">Inquiries & Accounts</div>
                     <a
-                      href="mailto:support@oncue.io"
+                      href="mailto:onque.connect@gmail.com"
                       className="text-[#F0F3F6] hover:text-blue-400 transition-colors font-mono font-medium text-xs"
                     >
-                      support@oncue.io
+                      onque.connect@gmail.com
                     </a>
                   </div>
                 </div>
@@ -252,9 +249,12 @@ export default function ContactPage() {
                   <Phone className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
                   <div>
                     <div className="text-[11px] text-[#8492A6]">Contractor Hotline</div>
-                    <div className="text-[#F0F3F6] font-mono font-medium">
-                      +1 (888) 492-ONCUE
-                    </div>
+                    <a
+                      href="tel:+17789864390"
+                      className="text-[#F0F3F6] hover:text-blue-400 transition-colors font-mono font-medium"
+                    >
+                      +1 (778) 986-4390
+                    </a>
                   </div>
                 </div>
 
@@ -263,9 +263,9 @@ export default function ContactPage() {
                   <div>
                     <div className="text-[11px] text-[#8492A6]">Operations Center</div>
                     <div className="text-[#F0F3F6] leading-relaxed">
-                      Bay Street Financial District
+                      9970 124A Street
                       <br />
-                      Toronto, ON M5J 2T3, Canada
+                      Surrey, British Columbia, Canada
                     </div>
                   </div>
                 </div>

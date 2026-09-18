@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { OncueBrand } from "@/components/brand/oncue-brand";
 import { SiteFooter } from "@/components/brand/site-footer";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
   Shield,
   Lock,
@@ -284,9 +283,11 @@ const SECTIONS = [
               Designated Data Protection Desk
             </div>
             <div className="text-xs text-[#8492A6] mt-0.5">
-              Email: <span className="font-mono text-blue-400">privacy@oncue.io</span>
+              Email: <span className="font-mono text-blue-400">onque.connect@gmail.com</span>
               <br />
-              Address: Bay Street Financial District, Toronto, ON M5J 2T3, Canada
+              Phone: <span className="font-mono text-blue-400">+1 (778) 986-4390</span>
+              <br />
+              Address: 9970 124A Street, Surrey, British Columbia, Canada
             </div>
           </div>
           <Link
@@ -329,12 +330,17 @@ export default function PrivacyPolicyPage() {
             </Link>
           </nav>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <Link
               href="/app"
-              className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white text-xs sm:text-sm font-medium transition-all shadow-[0_4px_16px_rgba(37,99,235,0.3)]"
+              className="text-sm font-medium text-[#A1A1AA] hover:text-[#F4F4F5] transition-colors px-3 py-1.5"
             >
-              Open Dashboard
+              Sign In
+            </Link>
+            <Link
+              href="/app"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg copper-cta text-white text-xs sm:text-sm font-medium transition-all shadow-sm"
+            >
+              Start Free
             </Link>
           </div>
         </div>

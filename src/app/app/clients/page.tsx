@@ -164,11 +164,10 @@ export default function ClientsListPage() {
             <button
               key={filter}
               onClick={() => setRiskFilter(filter)}
-              className={`px-3 py-1 rounded transition-colors ${
-                riskFilter === filter
-                  ? "bg-[#161A1D] text-[#F0F3F6] shadow-xs border border-[#22262B]"
-                  : "text-[#8492A6] hover:text-[#F0F3F6]"
-              }`}
+              className={`px-3 py-1 rounded transition-colors ${riskFilter === filter
+                ? "bg-[#161A1D] text-[#F0F3F6] shadow-xs border border-[#22262B]"
+                : "text-[#8492A6] hover:text-[#F0F3F6]"
+                }`}
             >
               {filter}
             </button>
@@ -217,8 +216,8 @@ export default function ClientsListPage() {
                       parseInt(client.paidOnTime) >= 85
                         ? "text-emerald-400"
                         : parseInt(client.paidOnTime) >= 70
-                        ? "text-amber-400"
-                        : "text-rose-400"
+                          ? "text-amber-400"
+                          : "text-rose-400"
                     }
                   >
                     {client.paidOnTime}
@@ -232,13 +231,12 @@ export default function ClientsListPage() {
                 </td>
                 <td className="py-3.5 px-4">
                   <span
-                    className={`px-2 py-0.5 rounded text-[11px] font-medium border ${
-                      client.risk === "Low Risk"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                        : client.risk === "Medium Risk"
+                    className={`px-2 py-0.5 rounded text-[11px] font-medium border ${client.risk === "Low Risk"
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      : client.risk === "Medium Risk"
                         ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                         : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                    }`}
+                      }`}
                   >
                     {client.risk}
                   </span>

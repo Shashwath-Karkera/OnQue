@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { OncueBrand } from "@/components/brand/oncue-brand";
 import { SiteFooter } from "@/components/brand/site-footer";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
   Scale,
   FileCheck,
@@ -152,7 +151,7 @@ const ARTICLES = [
             <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
             <span>
               You must notify ONcue immediately at{" "}
-              <span className="text-[#F0F3F6] font-mono">security@oncue.io</span> of
+              <span className="text-[#F0F3F6] font-mono">onque.connect@gmail.com</span> of
               any unauthorized account breach.
             </span>
           </li>
@@ -238,9 +237,11 @@ const ARTICLES = [
             <br />
             Attention: Legal Department
             <br />
-            Bay Street Financial District, Toronto, ON M5J 2T3, Canada
+            9970 124A Street, Surrey, British Columbia, Canada
             <br />
-            Email: <span className="text-blue-400 font-mono">legal@oncue.io</span>
+            Email: <span className="text-blue-400 font-mono">onque.connect@gmail.com</span>
+            <br />
+            Phone: <span className="text-blue-400 font-mono">+1 (778) 986-4390</span>
           </div>
         </div>
       </div>
@@ -276,12 +277,17 @@ export default function TermsOfServicePage() {
             </Link>
           </nav>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <Link
               href="/app"
-              className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white text-xs sm:text-sm font-medium transition-all shadow-[0_4px_16px_rgba(37,99,235,0.3)]"
+              className="text-sm font-medium text-[#A1A1AA] hover:text-[#F4F4F5] transition-colors px-3 py-1.5"
             >
-              Open Dashboard
+              Sign In
+            </Link>
+            <Link
+              href="/app"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg copper-cta text-white text-xs sm:text-sm font-medium transition-all shadow-sm"
+            >
+              Start Free
             </Link>
           </div>
         </div>

@@ -65,11 +65,10 @@ export default function ClientProfilePage() {
                 {client.name}
               </h1>
               <span
-                className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                  client.risk === "Low Risk"
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                    : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                }`}
+                className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${client.risk === "Low Risk"
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                  : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                  }`}
               >
                 {client.risk}
               </span>
@@ -183,11 +182,10 @@ export default function ClientProfilePage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`pb-3 capitalize transition-colors ${
-                  activeTab === tab
-                    ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
-                    : "hover:text-[#F0F3F6]"
-                }`}
+                className={`pb-3 capitalize transition-colors ${activeTab === tab
+                  ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
+                  : "hover:text-[#F0F3F6]"
+                  }`}
               >
                 {tab}
               </button>
