@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   DollarSign,
@@ -8,11 +9,8 @@ import {
   AlertTriangle,
   Clock,
   CheckCircle2,
-  Plus,
   ArrowRight,
   TrendingUp,
-  ShieldAlert,
-  ArrowUpRight,
   CreditCard,
   Building,
   Sparkles,
@@ -20,93 +18,169 @@ import {
   Layers,
 } from "lucide-react";
 
-const RECENT_PAYMENTS = [
-  {
-    client: "Northstar Renovations",
-    invoice: "INV-2024-041",
-    amount: "$12,400",
-    dueDate: "Oct 14, 2024",
-    status: "Paid",
-    delay: "On time",
-  },
-  {
-    client: "Apex Construction Group",
-    invoice: "INV-2024-039",
-    amount: "$8,400",
-    dueDate: "Oct 02, 2024",
-    status: "Paid",
-    delay: "+3 days",
-  },
-  {
-    client: "Summit Commercial Fitouts",
-    invoice: "INV-2024-045",
-    amount: "$15,200",
-    dueDate: "Nov 01, 2024",
-    status: "Pending",
-    delay: "Due in 12 days",
-  },
-  {
-    client: "Vanguard Properties",
-    invoice: "INV-2024-032",
-    amount: "$6,800",
-    dueDate: "Sep 18, 2024",
-    status: "Overdue",
-    delay: "14 days late",
-  },
-];
-
-const ATTENTION_CARDS = [
-  {
-    id: 1,
-    title: "Vanguard Properties — Invoice #1032 is 14 days overdue",
-    detail: "$6,800 outstanding for HVAC rough-in phase. AI recommends pausing finish trim staging.",
-    level: "high",
-    tag: "High Action Required",
-    link: "/app/invoices",
-    icon: AlertTriangle,
-  },
-  {
-    id: 2,
-    title: "Upcoming payment due: Summit Commercial ($15,200)",
-    detail: "Milestone 2 sign-off complete. Automated Net 15 reminder scheduled in 48 hours.",
-    level: "normal",
-    tag: "Scheduled Settlement",
-    link: "/app/payments",
-    icon: Clock,
-  },
-  {
-    id: 3,
-    title: "Apex Construction risk indicator changed to Medium Risk",
-    detail: "Average payment delay has extended from 2.1 to 6.2 days over last 2 billing cycles.",
-    level: "medium",
-    tag: "Reliability Alert",
-    link: "/app/clients/2",
-    icon: ShieldAlert,
-  },
-];
-
 export default function AppDashboardPage() {
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [metrics, setMetrics] = useState<{
+    totalRevenueSettled: number;
+    totalOutstanding: number;
+    activeClientsCount: number;
+    overdueInvoicesCount: number;
+    averageDelayDays: number;
+    recentPayments: any[];
+    attentionCards: any[];
+    velocityTrend?: { month: string; days: number; val: number; count: number }[];
+  }>({
+    totalRevenueSettled: 0,
+    totalOutstanding: 0,
+    activeClientsCount: 0,
+    overdueInvoicesCount: 0,
+    averageDelayDays: 0,
+    recentPayments: [],
+    attentionCards: [],
+    velocityTrend: [],
+  });
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/auth/me").then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/analytics").then((r) => (r.ok ? r.json() : null)),
+    ])
+      .then(([userData, analyticsData]) => {
+        if (userData?.user) {
+          setUser(userData.user);
+        }
+        if (analyticsData?.metrics) {
+          setMetrics(analyticsData.metrics);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat("en-CA", {
+      style: "currency",
+      currency: "CAD",
+      maximumFractionDigits: 0,
+    }).format(val || 0);
+  };
+
+  const attentionCardsToRender = metrics.attentionCards || [];
+
+  const paymentsToRender = (metrics.recentPayments || []).map((p: any) => ({
+    client: p.client_name || "Direct Client",
+    invoice: p.invoice_number || "INV-SETTLED",
+    amount: formatCurrency(Number(p.amount_cad || 0)),
+    dueDate: p.due_date
+      ? new Date(p.due_date).toLocaleDateString("en-CA", {
+          month: "short",
+          day: "numeric",
+        })
+      : "-",
+    delay: p.delay_days > 0 ? `+${p.delay_days}d late` : "Settled on time",
+    status: p.settlement_status || "Paid",
+  }));
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  };
+
   return (
-    <div className="space-y-8">
-      {/* 1. Header with Gradient Accent */}
+    <div className="space-y-8 antialiased">
+      {/* 1. Header with Gradient Accent & Quick Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#22262B]">
         <div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#F0F3F6] flex items-center gap-2">
-            <span>Good morning, Shashwath</span>
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+            <span>{getGreeting()}, {user?.name ? user.name.split(" ")[0] : "Contractor"}</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           </h1>
           <p className="text-xs sm:text-sm text-[#8492A6] mt-1">
-            Here's what needs your attention today.
+            Real-time payment intelligence and settlement metrics from Neon database.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Quick Action Buttons */}
+        <div className="flex items-center gap-2 shrink-0">
           <Link
-            href="/app/clients"
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white text-xs font-medium transition-all shadow-[0_4px_16px_rgba(37,99,235,0.3)] flex items-center gap-1.5 active:scale-95"
+            href="/app/projects"
+            className="px-3.5 py-2 rounded-md bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-medium transition-colors shadow-sm"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>+ Add Client</span>
+            + New Project
+          </Link>
+          <Link
+            href="/app/invoices"
+            className="px-3 py-2 rounded-md bg-[#161A1D] hover:bg-[#20252B] border border-[#22262B] text-xs font-medium text-[#F0F3F6] transition-colors"
+          >
+            + Bill Client
+          </Link>
+          <Link
+            href="/app/payments"
+            className="px-3 py-2 rounded-md bg-[#161A1D] hover:bg-[#20252B] border border-[#22262B] text-xs font-medium text-emerald-400 transition-colors"
+          >
+            Record Payment
+          </Link>
+        </div>
+      </div>
+
+      {/* Simplified 3-Step Life Cycle Guide */}
+      <div className="rounded-xl border border-white/10 bg-gradient-to-r from-blue-950/20 via-[#111417] to-emerald-950/20 p-4 shadow-md">
+        <div className="text-[11px] font-mono text-[#8492A6] uppercase tracking-wider mb-2 font-semibold flex items-center gap-2">
+          <span>Simple 3-Step Project Workflow</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <Link
+            href="/app/projects"
+            className="p-3 rounded-lg bg-[#0B0D0F]/70 border border-white/5 hover:border-blue-500/30 transition-colors group flex items-start gap-3"
+          >
+            <div className="w-7 h-7 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
+              1
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-[#F0F3F6] group-hover:text-blue-400 transition-colors">
+                Start a Project
+              </div>
+              <div className="text-[11px] text-[#8492A6] mt-0.5">
+                Set contract total & client
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="/app/invoices"
+            className="p-3 rounded-lg bg-[#0B0D0F]/70 border border-white/5 hover:border-blue-500/30 transition-colors group flex items-start gap-3"
+          >
+            <div className="w-7 h-7 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
+              2
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-[#F0F3F6] group-hover:text-blue-400 transition-colors">
+                Bill Milestone Invoices
+              </div>
+              <div className="text-[11px] text-[#8492A6] mt-0.5">
+                Send progress draws as work completes
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="/app/payments"
+            className="p-3 rounded-lg bg-[#0B0D0F]/70 border border-white/5 hover:border-emerald-500/30 transition-colors group flex items-start gap-3"
+          >
+            <div className="w-7 h-7 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
+              3
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-[#F0F3F6] group-hover:text-emerald-400 transition-colors">
+                Settle Payments
+              </div>
+              <div className="text-[11px] text-[#8492A6] mt-0.5">
+                Record receipts & update reliability score
+              </div>
+            </div>
           </Link>
         </div>
       </div>
@@ -117,17 +191,17 @@ export default function AppDashboardPage() {
         <div className="relative group overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-[#161B22]/90 to-[#0F1318]/95 p-5 shadow-lg backdrop-blur-md transition-all hover:border-blue-500/40 hover:shadow-[0_8px_24px_rgba(37,99,235,0.15)] hover:-translate-y-0.5">
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500/0 via-blue-500/50 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#8492A6]">Revenue</span>
+            <span className="text-xs font-medium text-[#8492A6]">Total Settled</span>
             <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-[#F0F3F6] mt-3 font-mono">
-            $42,800
+            {formatCurrency(metrics.totalRevenueSettled)}
           </div>
           <div className="flex items-center gap-1 text-[11px] text-emerald-400 mt-2 font-medium">
             <TrendingUp className="w-3 h-3" />
-            <span>+18.4% from last month</span>
+            <span>Cleared via Remittance Ledger</span>
           </div>
         </div>
 
@@ -141,10 +215,10 @@ export default function AppDashboardPage() {
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-[#F0F3F6] mt-3 font-mono">
-            $8,400
+            {formatCurrency(metrics.totalOutstanding)}
           </div>
           <div className="text-[11px] text-[#8492A6] mt-2">
-            Across 3 active milestones
+            Active milestone exposure
           </div>
         </div>
 
@@ -158,10 +232,10 @@ export default function AppDashboardPage() {
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-[#F0F3F6] mt-3 font-mono">
-            6
+            {metrics.activeClientsCount}
           </div>
           <div className="text-[11px] text-emerald-400/90 mt-2">
-            4 Low Risk · 2 Monitored
+            Avg delay: {metrics.averageDelayDays}d
           </div>
         </div>
 
@@ -175,15 +249,15 @@ export default function AppDashboardPage() {
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-rose-400 mt-3 font-mono">
-            2
+            {metrics.overdueInvoicesCount}
           </div>
           <div className="text-[11px] text-rose-400/80 mt-2">
-            Requires follow-up notice
+            Requires automated notice
           </div>
         </div>
       </div>
 
-      {/* 3. Attention Required (Card Grid rather than plain list) */}
+      {/* 3. Attention Required */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -192,60 +266,66 @@ export default function AppDashboardPage() {
               Attention Required
             </h2>
           </div>
-          <span className="text-xs font-mono text-[#8492A6]">3 priority actions</span>
+          <span className="text-xs font-mono text-[#8492A6]">Priority actions</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {ATTENTION_CARDS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.id}
-                href={item.link}
-                className="group relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-[#141820]/90 to-[#0E1117] p-5 shadow-lg backdrop-blur-md transition-all hover:border-blue-500/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] hover:-translate-y-1 flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase ${item.level === "high"
-                        ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                        : item.level === "medium"
-                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                          : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+        {attentionCardsToRender.length === 0 ? (
+          <div className="rounded-xl border border-white/10 bg-gradient-to-b from-[#141820]/90 to-[#0E1117] p-6 text-center shadow-lg backdrop-blur-md">
+            <div className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-2">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+            <h3 className="text-xs font-semibold text-[#F0F3F6]">All Accounts In Good Standing</h3>
+            <p className="text-[11px] text-[#8492A6] mt-1">
+              Zero overdue milestone holdbacks or payment delays detected in your Neon ledger.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {attentionCardsToRender.map((item: any) => {
+              const isHigh = item.level === "high";
+              return (
+                <Link
+                  key={item.id}
+                  href={item.link || "/app/invoices"}
+                  className="group relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-[#141820]/90 to-[#0E1117] p-5 shadow-lg backdrop-blur-md transition-all hover:border-blue-500/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] hover:-translate-y-1 flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase ${
+                          isHigh
+                            ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                            : "bg-amber-500/10 text-amber-400 border-amber-500/20"
                         }`}
-                    >
-                      {item.tag}
-                    </span>
-                    <Icon
-                      className={`w-4 h-4 ${item.level === "high"
-                        ? "text-rose-400"
-                        : item.level === "medium"
-                          ? "text-amber-400"
-                          : "text-blue-400"
-                        }`}
-                    />
+                      >
+                        {item.tag || "Action Required"}
+                      </span>
+                      <AlertTriangle
+                        className={`w-4 h-4 ${isHigh ? "text-rose-400" : "text-amber-400"}`}
+                      />
+                    </div>
+
+                    <h3 className="text-xs font-semibold text-[#F0F3F6] group-hover:text-blue-400 transition-colors leading-snug">
+                      {item.title}
+                    </h3>
+
+                    <p className="text-xs text-[#8492A6] leading-relaxed">
+                      {item.detail}
+                    </p>
                   </div>
 
-                  <h3 className="text-xs font-semibold text-[#F0F3F6] group-hover:text-blue-400 transition-colors leading-snug">
-                    {item.title}
-                  </h3>
-
-                  <p className="text-xs text-[#8492A6] leading-relaxed">
-                    {item.detail}
-                  </p>
-                </div>
-
-                <div className="pt-4 mt-3 border-t border-white/5 flex items-center justify-between text-xs text-blue-400 font-medium group-hover:text-blue-300">
-                  <span>Take action</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                  <div className="pt-4 mt-3 border-t border-white/5 flex items-center justify-between text-xs text-blue-400 font-medium group-hover:text-blue-300">
+                    <span>Take action</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* 4. Recent Payments (Card wrapper with beautiful header) */}
+      {/* 4. Recent Payments */}
       <div className="rounded-xl border border-white/10 bg-gradient-to-b from-[#141820]/80 to-[#0E1117] p-5 shadow-xl backdrop-blur-md space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-white/5">
           <div className="flex items-center gap-2">
@@ -276,33 +356,40 @@ export default function AppDashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {RECENT_PAYMENTS.map((row, i) => (
-                <tr key={i} className="hover:bg-white/[0.03] transition-colors">
-                  <td className="py-3.5 px-4 font-medium text-[#F0F3F6]">
-                    {row.client}
-                  </td>
-                  <td className="py-3.5 px-4 font-mono text-[#8492A6]">
-                    {row.invoice}
-                  </td>
-                  <td className="py-3.5 px-4 font-semibold text-[#F0F3F6] font-mono">
-                    {row.amount}
-                  </td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">{row.dueDate}</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">{row.delay}</td>
-                  <td className="py-3.5 px-4 text-right">
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${row.status === "Paid"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                        : row.status === "Pending"
-                          ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                          : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                        }`}
-                    >
-                      {row.status}
-                    </span>
+              {paymentsToRender.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-[#8492A6] text-xs">
+                    No remittances recorded yet in Neon. Click &quot;Record Payment&quot; in the Payments page to track settlements.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                paymentsToRender.map((row: any, i: number) => (
+                  <tr key={i} className="hover:bg-white/[0.03] transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-[#F0F3F6]">
+                      {row.client}
+                    </td>
+                    <td className="py-3.5 px-4 font-mono text-[#8492A6]">
+                      {row.invoice}
+                    </td>
+                    <td className="py-3.5 px-4 font-semibold text-[#F0F3F6] font-mono">
+                      {row.amount}
+                    </td>
+                    <td className="py-3.5 px-4 text-[#8492A6]">{row.dueDate}</td>
+                    <td className="py-3.5 px-4 text-[#8492A6]">{row.delay}</td>
+                    <td className="py-3.5 px-4 text-right">
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
+                          row.status === "Paid" || row.status === "Completed"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                            : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                        }`}
+                      >
+                        {row.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -319,43 +406,48 @@ export default function AppDashboardPage() {
               </h3>
             </div>
             <p className="text-xs text-[#8492A6] mt-1">
-              Average days to receive funds upon invoice generation over past 6 months
+              Average days to receive full milestone settlement across 6 months from Neon.
             </p>
           </div>
-          <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-400 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 self-start sm:self-auto">
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>-3.2 days improvement</span>
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-sm bg-blue-500" />
+            <span className="text-[11px] font-mono text-[#A0AEC0]">Avg Days to Clear</span>
           </div>
         </div>
 
-        {/* Dynamic Glassmorphic Bar Graph */}
-        <div className="h-32 flex items-end justify-between gap-3 pt-6 border-b border-white/5 pb-3">
-          {[
-            { month: "May", days: 12.4, val: 55 },
-            { month: "Jun", days: 10.8, val: 48 },
-            { month: "Jul", days: 9.1, val: 40 },
-            { month: "Aug", days: 7.6, val: 34 },
-            { month: "Sep", days: 5.2, val: 24 },
-            { month: "Oct (MTD)", days: 4.8, val: 22 },
-          ].map((item, idx) => (
-            <div key={idx} className="flex-1 flex flex-col items-center gap-2">
-              <div className="text-[10px] font-mono text-[#8492A6]">
-                {item.days}d
+        {/* Minimalist Bar Chart Representation from Live Neon Data */}
+        <div className="h-36 pt-4 flex items-end justify-between gap-3 border-b border-white/5 pb-2">
+          {metrics.velocityTrend && metrics.velocityTrend.length > 0 ? (
+            metrics.velocityTrend.map((item) => (
+              <div key={item.month} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
+                <div className="text-[10px] font-mono text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {item.days}d
+                </div>
+                <div
+                  className={`w-full max-w-[48px] rounded-t-md transition-all cursor-pointer ${
+                    item.days > 0
+                      ? "bg-gradient-to-t from-blue-900/40 via-blue-600/60 to-blue-500 hover:from-blue-600 hover:to-cyan-400 shadow-[0_2px_8px_rgba(37,99,235,0.2)]"
+                      : "bg-[#1A1F26] hover:bg-[#222832]"
+                  }`}
+                  style={{ height: `${Math.max(6, item.val * 1.4)}px` }}
+                />
+                <div className="text-[11px] text-[#8492A6] font-mono">
+                  {item.month}
+                </div>
               </div>
-              <div
-                className="w-full max-w-[48px] bg-gradient-to-t from-blue-900/40 via-blue-600/60 to-blue-500 rounded-t-md hover:from-blue-600 hover:to-cyan-400 transition-all cursor-pointer shadow-[0_2px_8px_rgba(37,99,235,0.2)]"
-                style={{ height: `${item.val * 1.5}px` }}
-              />
-              <div className="text-[11px] text-[#8492A6] font-mono">
-                {item.month}
-              </div>
+            ))
+          ) : (
+            <div className="w-full flex items-center justify-center text-xs text-[#8492A6] py-10">
+              Synchronizing settlement metrics from Neon...
             </div>
-          ))}
+          )}
         </div>
 
         <div className="text-[11px] text-[#8492A6] flex flex-col sm:flex-row items-center justify-between gap-2 pt-1">
           <span>Target contractual settlement: Net 15 days</span>
-          <span className="text-[#F0F3F6] font-medium">Current portfolio median: 4.8 days</span>
+          <span className="text-[#F0F3F6] font-medium">
+            Current portfolio median: {metrics.averageDelayDays > 0 ? `${metrics.averageDelayDays} days` : "0 days (No delays recorded)"}
+          </span>
         </div>
       </div>
     </div>

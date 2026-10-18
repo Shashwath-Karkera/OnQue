@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -9,41 +9,108 @@ import {
   CheckCircle2,
   AlertTriangle,
   Sparkles,
-  Plus,
   CreditCard,
   Building2,
   Layers,
   Calendar,
   FileText,
-  TrendingUp,
   ShieldCheck,
-  Percent,
   Clock,
+  Loader2,
 } from "lucide-react";
 
 export default function ClientProfilePage() {
   const params = useParams();
+  const clientId = (params?.id as string) || "";
+
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<{
+    client: any;
+    invoices: any[];
+    projects: any[];
+  } | null>(null);
+
   const [activeTab, setActiveTab] = useState<
     "overview" | "payments" | "projects" | "activity"
   >("overview");
 
-  const isNorthstar = params?.id === "1" || params?.id === "northstar-renovations";
+  useEffect(() => {
+    async function loadClient() {
+      if (!clientId) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/clients/${clientId}`);
+        const json = await res.json();
+        if (json.success) {
+          setData(json);
+        }
+      } catch (err) {
+        console.error("Failed to load client profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadClient();
+  }, [clientId]);
 
-  const client = {
-    name: isNorthstar ? "Northstar Renovations" : "Apex Construction Group",
-    trade: isNorthstar ? "General Contractor" : "Commercial General Contractor",
-    location: isNorthstar ? "Toronto, Canada" : "Mississauga, Canada",
-    score: isNorthstar ? 92 : 71,
-    risk: isNorthstar ? "Low Risk" : "Medium Risk",
-    invoicesCount: isNorthstar ? 24 : 18,
-    onTimeCount: isNorthstar ? 22 : 13,
-    avgDelay: isNorthstar ? "1.8 days" : "6.2 days",
-    totalSettled: isNorthstar ? "$148,200" : "$94,400",
-    outstanding: isNorthstar ? "$6,400" : "$12,800",
+  const formatCAD = (amount: number | string | undefined) => {
+    const val = typeof amount === "string" ? parseFloat(amount) : amount;
+    return new Intl.NumberFormat("en-CA", {
+      style: "currency",
+      currency: "CAD",
+      maximumFractionDigits: 0,
+    }).format(val || 0);
   };
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleDateString("en-CA", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="py-24 flex flex-col items-center justify-center gap-3 text-xs text-[#8492A6]">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+        <span>Loading client profile and ledger from Neon...</span>
+      </div>
+    );
+  }
+
+  if (!data?.client) {
+    return (
+      <div className="py-24 text-center space-y-4">
+        <h2 className="text-lg font-semibold text-[#F0F3F6]">Client Not Found</h2>
+        <p className="text-xs text-[#8492A6]">
+          This client record does not exist in your Neon database or you do not have permission to view it.
+        </p>
+        <Link
+          href="/app/clients"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-medium transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Clients</span>
+        </Link>
+      </div>
+    );
+  }
+
+  const client = data.client;
+
+  const invoices = data?.invoices || [];
+  const projects = data?.projects || [];
+
+  const paidInvoices = invoices.filter((i) => i.status === "Paid");
+  const onTimeCount = paidInvoices.filter((i) => (i.delay_days ?? 0) <= 0).length;
+  const lateCount = paidInvoices.filter((i) => (i.delay_days ?? 0) > 0).length;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 antialiased">
       {/* 1. Header with Breadcrumb & Action Buttons */}
       <div className="space-y-3">
         <div className="flex items-center gap-2 text-xs text-[#8492A6]">
@@ -65,16 +132,19 @@ export default function ClientProfilePage() {
                 {client.name}
               </h1>
               <span
-                className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${client.risk === "Low Risk"
-                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                  : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                  }`}
+                className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                  client.risk_band === "Low Risk"
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                    : client.risk_band === "Medium Risk"
+                    ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                    : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                }`}
               >
-                {client.risk}
+                {client.risk_band}
               </span>
             </div>
             <p className="text-xs text-[#8492A6] mt-1">
-              {client.trade} · {client.location}
+              {client.trade_type} · {client.location}
             </p>
           </div>
 
@@ -95,7 +165,7 @@ export default function ClientProfilePage() {
         </div>
       </div>
 
-      {/* 2. Attractive Glassmorphic Metric Cards Row */}
+      {/* 2. Glassmorphic Metric Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Score */}
         <div className="relative group overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-[#161B22]/90 to-[#0F1318]/95 p-5 shadow-lg backdrop-blur-md transition-all hover:border-emerald-500/40 hover:-translate-y-0.5">
@@ -115,7 +185,7 @@ export default function ClientProfilePage() {
           </div>
           <div className="text-xs text-emerald-400 mt-2 flex items-center gap-1 font-medium">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>High Reliability Score</span>
+            <span>{client.risk_band} Assessment</span>
           </div>
         </div>
 
@@ -123,17 +193,19 @@ export default function ClientProfilePage() {
         <div className="relative group overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-[#161B22]/90 to-[#0F1318]/95 p-5 shadow-lg backdrop-blur-md transition-all hover:border-blue-500/40 hover:-translate-y-0.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#8492A6] uppercase tracking-wider font-mono">
-              Settlement
+              Settlement Rate
             </span>
             <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
               <FileText className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-[#F0F3F6] mt-2 font-mono">
-            {client.onTimeCount} of {client.invoicesCount}
+            {Number(client.on_time_rate ?? 100)}%
           </div>
           <div className="text-xs text-[#8492A6] mt-2">
-            92% settled strictly on time
+            {invoices.length > 0
+              ? `${onTimeCount} of ${invoices.length} invoices on time`
+              : "Strict payment verification"}
           </div>
         </div>
 
@@ -148,10 +220,10 @@ export default function ClientProfilePage() {
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-[#F0F3F6] mt-2 font-mono">
-            {client.avgDelay}
+            {Number(client.avg_delay_days ?? 0).toFixed(1)} days
           </div>
           <div className="text-xs text-[#8492A6] mt-2">
-            Standard: Net 15 Days
+            Standard: {client.recommended_terms || "Net 15 Days"}
           </div>
         </div>
 
@@ -159,17 +231,17 @@ export default function ClientProfilePage() {
         <div className="relative group overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-[#161B22]/90 to-[#0F1318]/95 p-5 shadow-lg backdrop-blur-md transition-all hover:border-amber-500/40 hover:-translate-y-0.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#8492A6] uppercase tracking-wider font-mono">
-              Volume
+              Total Volume
             </span>
             <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
               <CreditCard className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-[#F0F3F6] mt-2 font-mono">
-            {client.totalSettled}
+            {formatCAD(client.total_volume_cad)}
           </div>
           <div className="text-xs text-amber-400/90 mt-2 font-mono">
-            {client.outstanding} active outstanding
+            {formatCAD(client.outstanding_cad)} active outstanding
           </div>
         </div>
       </div>
@@ -182,10 +254,11 @@ export default function ClientProfilePage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`pb-3 capitalize transition-colors ${activeTab === tab
-                  ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
-                  : "hover:text-[#F0F3F6]"
-                  }`}
+                className={`pb-3 capitalize transition-colors cursor-pointer ${
+                  activeTab === tab
+                    ? "text-[#F0F3F6] border-b-2 border-[#3B82F6]"
+                    : "hover:text-[#F0F3F6]"
+                }`}
               >
                 {tab}
               </button>
@@ -197,7 +270,7 @@ export default function ClientProfilePage() {
       {/* Tab: OVERVIEW */}
       {activeTab === "overview" && (
         <div className="space-y-6">
-          {/* ONcue AI Insight Glass Card */}
+          {/* ONcue Intelligence Glass Card */}
           <div className="rounded-xl border border-blue-500/30 bg-gradient-to-r from-blue-950/40 via-[#141820]/80 to-[#0E1117] p-5 shadow-xl backdrop-blur-md flex items-start gap-4">
             <div className="w-9 h-9 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
               <Sparkles className="w-5 h-5" />
@@ -206,18 +279,26 @@ export default function ClientProfilePage() {
               <div className="text-xs font-semibold uppercase tracking-wider font-mono text-[#F0F3F6] flex items-center gap-2">
                 <span>ONcue Payment Intelligence</span>
                 <span className="text-[10px] text-emerald-400 font-mono px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-                  Calibrated
+                  Neon Synced
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-[#A0AEC0] leading-relaxed">
-                Payment behavior has remained consistent over the last 6 months.
-                Most invoices are paid within the agreed Net 15 schedule. Minor
-                delays only occurred on retainage closeouts exceeding $25,000.
+                {invoices.length > 0 ? (
+                  <>
+                    Client holds an empirical score of {client.score}/100 based on {invoices.length} historical invoice{invoices.length > 1 ? "s" : ""}.
+                    Average delay velocity is {Number(client.avg_delay_days ?? 0).toFixed(1)} days.
+                    Recommended contract terms specify {client.recommended_deposit_pct || 20}% upfront deposit on future jobs.
+                  </>
+                ) : (
+                  <>
+                    Client record initialized in Neon with {projects.length} project{projects.length !== 1 ? "s" : ""}. Baseline empirical score of {client.score}/100 active pending cleared remittance history.
+                  </>
+                )}
               </p>
             </div>
           </div>
 
-          {/* Recommended Terms in 3 Interactive Cards */}
+          {/* Recommended Terms in 3 Cards */}
           <div className="space-y-3">
             <div className="text-xs font-semibold text-[#F0F3F6] uppercase tracking-wider font-mono flex items-center gap-2">
               <Layers className="w-3.5 h-3.5 text-blue-400" />
@@ -227,8 +308,8 @@ export default function ClientProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="rounded-xl border border-white/10 bg-gradient-to-b from-[#161B22]/90 to-[#0F1318]/95 p-5 shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-colors">
                 <div className="text-xs text-[#8492A6]">Upfront Deposit</div>
-                <div className="text-xl font-bold text-[#F0F3F6] mt-2">
-                  20% Upfront
+                <div className="text-xl font-bold text-[#F0F3F6] mt-2 font-mono">
+                  {client.recommended_deposit_pct || 20}% Upfront
                 </div>
                 <div className="text-[11px] text-[#8492A6] mt-1">
                   Protects initial mobilization & materials
@@ -237,8 +318,8 @@ export default function ClientProfilePage() {
 
               <div className="rounded-xl border border-white/10 bg-gradient-to-b from-[#161B22]/90 to-[#0F1318]/95 p-5 shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-colors">
                 <div className="text-xs text-[#8492A6]">Payment Window</div>
-                <div className="text-xl font-bold text-[#F0F3F6] mt-2">
-                  Net 15 Days
+                <div className="text-xl font-bold text-[#F0F3F6] mt-2 font-mono">
+                  {client.recommended_terms || "Net 15 Days"}
                 </div>
                 <div className="text-[11px] text-[#8492A6] mt-1">
                   Matches client historical turnaround
@@ -247,17 +328,17 @@ export default function ClientProfilePage() {
 
               <div className="rounded-xl border border-white/10 bg-gradient-to-b from-[#161B22]/90 to-[#0F1318]/95 p-5 shadow-lg backdrop-blur-md hover:border-blue-500/40 transition-colors">
                 <div className="text-xs text-[#8492A6]">Billing Schedule</div>
-                <div className="text-xl font-bold text-[#F0F3F6] mt-2">
-                  Milestone Draws
+                <div className="text-xl font-bold text-[#F0F3F6] mt-2 font-mono">
+                  {projects.length > 0 ? `${projects.length} Active ${projects.length === 1 ? "Project" : "Projects"}` : "Direct Invoices"}
                 </div>
                 <div className="text-[11px] text-[#8492A6] mt-1">
-                  Rough-in, inspection, final completion
+                  {projects.length > 0 ? `${projects[0].retainage_pct ?? 10}% statutory retainage holdback` : "No linked project holdbacks"}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Payment Behavior Statistics Breakdown Card */}
+          {/* Historical Settlement Breakdown Card */}
           <div className="rounded-xl border border-white/10 bg-gradient-to-b from-[#141820]/80 to-[#0E1117] p-6 shadow-xl backdrop-blur-md space-y-4">
             <div className="text-xs font-semibold text-[#F0F3F6] uppercase tracking-wider font-mono">
               Historical Settlement Breakdown
@@ -266,25 +347,25 @@ export default function ClientProfilePage() {
               <div className="p-3.5 rounded-lg bg-[#0A0D12] border border-white/5">
                 <div className="text-xs text-[#8492A6]">On-time Payments</div>
                 <div className="text-xl font-bold text-emerald-400 mt-1 font-mono">
-                  22 (92%)
+                  {onTimeCount}
                 </div>
               </div>
               <div className="p-3.5 rounded-lg bg-[#0A0D12] border border-white/5">
-                <div className="text-xs text-[#8492A6]">Late Payments</div>
-                <div className="text-xl font-bold text-[#F0F3F6] mt-1 font-mono">
-                  2 (8%)
+                <div className="text-xs text-[#8492A6]">Late Settlements</div>
+                <div className="text-xl font-bold text-amber-400 mt-1 font-mono">
+                  {lateCount}
                 </div>
               </div>
               <div className="p-3.5 rounded-lg bg-[#0A0D12] border border-white/5">
-                <div className="text-xs text-[#8492A6]">Partial Payments</div>
+                <div className="text-xs text-[#8492A6]">Total Invoices</div>
                 <div className="text-xl font-bold text-[#F0F3F6] mt-1 font-mono">
-                  0 (0%)
+                  {invoices.length}
                 </div>
               </div>
               <div className="p-3.5 rounded-lg bg-[#0A0D12] border border-white/5">
-                <div className="text-xs text-[#8492A6]">Disputed Invoices</div>
+                <div className="text-xs text-[#8492A6]">Active Projects</div>
                 <div className="text-xl font-bold text-[#F0F3F6] mt-1 font-mono">
-                  0 (0%)
+                  {projects.length}
                 </div>
               </div>
             </div>
@@ -292,74 +373,68 @@ export default function ClientProfilePage() {
         </div>
       )}
 
-      {/* Tab: PAYMENTS */}
+      {/* Tab: PAYMENTS / INVOICES */}
       {activeTab === "payments" && (
         <div className="rounded-xl border border-white/10 bg-[#111417] p-5 shadow-xl backdrop-blur-md">
           <div className="overflow-x-auto rounded-lg border border-white/5 bg-[#0A0D12]">
             <table className="w-full text-xs text-left">
               <thead>
                 <tr className="border-b border-white/5 text-[#8492A6] bg-[#0E1218]">
-                  <th className="py-3 px-4 font-medium">Invoice</th>
+                  <th className="py-3 px-4 font-medium">Invoice #</th>
+                  <th className="py-3 px-4 font-medium">Project</th>
                   <th className="py-3 px-4 font-medium">Amount</th>
                   <th className="py-3 px-4 font-medium">Issued</th>
                   <th className="py-3 px-4 font-medium">Due</th>
-                  <th className="py-3 px-4 font-medium">Paid</th>
                   <th className="py-3 px-4 font-medium">Delay</th>
                   <th className="py-3 px-4 font-medium text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                <tr>
-                  <td className="py-3.5 px-4 font-mono text-[#F0F3F6]">
-                    INV-2024-041
-                  </td>
-                  <td className="py-3.5 px-4 font-semibold text-[#F0F3F6] font-mono">
-                    $12,400
-                  </td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">Sep 29, 2024</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">Oct 14, 2024</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">Oct 13, 2024</td>
-                  <td className="py-3.5 px-4 text-emerald-400">On time</td>
-                  <td className="py-3.5 px-4 text-right">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      Paid
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3.5 px-4 font-mono text-[#F0F3F6]">
-                    INV-2024-038
-                  </td>
-                  <td className="py-3.5 px-4 font-semibold text-[#F0F3F6] font-mono">
-                    $8,600
-                  </td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">Sep 13, 2024</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">Sep 28, 2024</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">Sep 30, 2024</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">+2 days</td>
-                  <td className="py-3.5 px-4 text-right">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      Paid
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3.5 px-4 font-mono text-[#F0F3F6]">
-                    INV-2024-049
-                  </td>
-                  <td className="py-3.5 px-4 font-semibold text-[#F0F3F6] font-mono">
-                    $6,400
-                  </td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">Oct 18, 2024</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">Nov 02, 2024</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">—</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">—</td>
-                  <td className="py-3.5 px-4 text-right">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                      Pending
-                    </span>
-                  </td>
-                </tr>
+                {invoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-[#8492A6]">
+                      No invoices recorded for this client yet.
+                    </td>
+                  </tr>
+                ) : (
+                  invoices.map((inv) => (
+                    <tr key={inv.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-medium text-[#F0F3F6]">
+                        {inv.invoice_number}
+                      </td>
+                      <td className="py-3.5 px-4 text-[#A0AEC0]">
+                        {inv.project_title || "Direct Engagement"}
+                      </td>
+                      <td className="py-3.5 px-4 font-semibold text-[#F0F3F6] font-mono">
+                        {formatCAD(inv.amount_cad)}
+                      </td>
+                      <td className="py-3.5 px-4 text-[#8492A6]">{formatDate(inv.issued_date)}</td>
+                      <td className="py-3.5 px-4 text-[#8492A6]">{formatDate(inv.due_date)}</td>
+                      <td className="py-3.5 px-4 font-mono">
+                        {(inv.delay_days ?? 0) <= 0 ? (
+                          <span className="text-emerald-400">On time</span>
+                        ) : (
+                          <span className="text-rose-400">+{inv.delay_days} days</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
+                            inv.status === "Paid"
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                              : inv.status === "Pending"
+                              ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                              : inv.status === "Overdue"
+                              ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                              : "bg-slate-500/10 text-slate-400 border-slate-500/20"
+                          }`}
+                        >
+                          {inv.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -376,37 +451,44 @@ export default function ClientProfilePage() {
                   <th className="py-3 px-4 font-medium">Project Name</th>
                   <th className="py-3 px-4 font-medium">Contract Value</th>
                   <th className="py-3 px-4 font-medium">Start Date</th>
-                  <th className="py-3 px-4 font-medium">Outstanding</th>
+                  <th className="py-3 px-4 font-medium">Retainage %</th>
                   <th className="py-3 px-4 font-medium text-right">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                <tr>
-                  <td className="py-3.5 px-4 font-medium text-[#F0F3F6]">
-                    Bay Street Office Fit-out
-                  </td>
-                  <td className="py-3.5 px-4 font-mono text-[#F0F3F6]">$48,000</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">Aug 15, 2024</td>
-                  <td className="py-3.5 px-4 font-mono text-[#F0F3F6]">$6,400</td>
-                  <td className="py-3.5 px-4 text-right">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                      In Progress
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3.5 px-4 font-medium text-[#F0F3F6]">
-                    Yorkville Retail Expansion
-                  </td>
-                  <td className="py-3.5 px-4 font-mono text-[#F0F3F6]">$32,500</td>
-                  <td className="py-3.5 px-4 text-[#8492A6]">May 10, 2024</td>
-                  <td className="py-3.5 px-4 font-mono text-emerald-400">$0</td>
-                  <td className="py-3.5 px-4 text-right">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      Completed
-                    </span>
-                  </td>
-                </tr>
+                {projects.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-[#8492A6]">
+                      No active projects on file for this client.
+                    </td>
+                  </tr>
+                ) : (
+                  projects.map((proj) => (
+                    <tr key={proj.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-[#F0F3F6]">
+                        {proj.title}
+                      </td>
+                      <td className="py-3.5 px-4 font-mono text-[#F0F3F6]">
+                        {formatCAD(proj.contract_value_cad)}
+                      </td>
+                      <td className="py-3.5 px-4 text-[#8492A6]">{formatDate(proj.start_date)}</td>
+                      <td className="py-3.5 px-4 font-mono text-[#8492A6]">
+                        {proj.retainage_pct ?? 10}%
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${
+                            proj.status === "Completed"
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                              : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                          }`}
+                        >
+                          {proj.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -417,26 +499,31 @@ export default function ClientProfilePage() {
       {activeTab === "activity" && (
         <div className="rounded-xl border border-white/10 bg-[#111417] p-6 shadow-xl backdrop-blur-md space-y-4">
           <div className="text-xs font-semibold text-[#F0F3F6] uppercase tracking-wider font-mono">
-            Recent Activity Feed
+            Recent Activity & Settlement Events
           </div>
           <div className="space-y-3 text-xs">
-            <div className="flex items-start gap-3 text-[#A0AEC0] p-3 rounded-lg bg-[#0A0D12] border border-white/5">
-              <span className="font-mono text-emerald-400 font-semibold shrink-0">Oct 13:</span>
-              <span>Invoice #INV-2024-041 paid in full ($12,400 via EFT).</span>
-            </div>
-            <div className="flex items-start gap-3 text-[#A0AEC0] p-3 rounded-lg bg-[#0A0D12] border border-white/5">
-              <span className="font-mono text-blue-400 font-semibold shrink-0">Sep 29:</span>
-              <span>Milestone 2 completed on Bay Street Office Fit-out.</span>
-            </div>
-            <div className="flex items-start gap-3 text-[#A0AEC0] p-3 rounded-lg bg-[#0A0D12] border border-white/5">
-              <span className="font-mono text-amber-400 font-semibold shrink-0">Sep 30:</span>
-              <span>Invoice #INV-2024-038 settled with 2-day grace period.</span>
-            </div>
+            {invoices.length > 0 ? (
+              invoices.slice(0, 5).map((inv) => (
+                <div
+                  key={inv.id}
+                  className="flex items-start gap-3 text-[#A0AEC0] p-3 rounded-lg bg-[#0A0D12] border border-white/5"
+                >
+                  <span className="font-mono text-emerald-400 font-semibold shrink-0">
+                    {formatDate(inv.issued_date)}:
+                  </span>
+                  <span>
+                    Invoice {inv.invoice_number} ({formatCAD(inv.amount_cad)}) recorded as {inv.status}.
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-[#8492A6]">No recorded activity yet.</div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Subtle Informational Disclaimer */}
+      {/* Informational Disclaimer */}
       <div className="text-[11px] text-[#555E6C] leading-relaxed pt-2">
         Risk indicators are based on available payment history and are intended
         for informational purposes only. They do not guarantee future payment

@@ -10,14 +10,12 @@ import {
   Briefcase,
   FileText,
   CreditCard,
-  Lightbulb,
   BarChart3,
   Bell,
   Settings,
   Menu,
   X,
   Search,
-  Plus,
   HelpCircle,
   LogOut,
 } from "lucide-react";
@@ -29,14 +27,13 @@ const PRIMARY_NAV = [
   { label: "Projects", href: "/app/projects", icon: Briefcase },
   { label: "Invoices", href: "/app/invoices", icon: FileText },
   { label: "Payments", href: "/app/payments", icon: CreditCard },
-  { label: "Insights", href: "/app/insights", icon: Lightbulb },
   { label: "Analytics", href: "/app/analytics", icon: BarChart3 },
 ];
 
 const SECONDARY_NAV = [
   { label: "Notifications", href: "/app/notifications", icon: Bell },
   { label: "Settings", href: "/app/settings", icon: Settings },
-  { label: "Help & Docs", href: "/about", icon: HelpCircle },
+  { label: "Help & Contact", href: "/app/contact", icon: HelpCircle },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -44,6 +41,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [unreadCount, setUnreadCount] = useState(0);
   const [user, setUser] = useState<{
     id: string;
     email: string;
@@ -51,6 +49,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     role: string;
     avatar_url?: string | null;
   } | null>(null);
+
+  const refreshUnreadCount = React.useCallback(() => {
+    fetch("/api/notifications")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.success && Array.isArray(data.notifications)) {
+          const count = data.notifications.filter((n: any) => n.unread).length;
+          setUnreadCount(count);
+        } else {
+          setUnreadCount(0);
+        }
+      })
+      .catch(() => {
+        setUnreadCount(0);
+      });
+  }, []);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -61,7 +75,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }
       })
       .catch(() => { });
-  }, []);
+
+    refreshUnreadCount();
+
+    const handleUpdate = () => refreshUnreadCount();
+    window.addEventListener("notifications-updated", handleUpdate);
+    return () => {
+      window.removeEventListener("notifications-updated", handleUpdate);
+    };
+  }, [pathname, refreshUnreadCount]);
 
   const handleLogout = async () => {
     try {
@@ -152,17 +174,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {SECONDARY_NAV.map((item) => {
                 const active = isActive(item.href);
                 const Icon = item.icon;
+                const isNotif = item.href === "/app/notifications";
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${active
+                    className={`flex items-center justify-between px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${active
                       ? "text-[#F0F3F6] bg-[#161A1D]"
                       : "text-[#8492A6] hover:text-[#F0F3F6]"
                       }`}
                   >
-                    <Icon className="w-3.5 h-3.5 text-[#555E6C]" />
-                    <span>{item.label}</span>
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-3.5 h-3.5 text-[#555E6C]" />
+                      <span>{item.label}</span>
+                    </div>
+                    {isNotif && unreadCount > 0 && (
+                      <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        {unreadCount}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -172,14 +202,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="pt-2 border-t border-[#22262B] space-y-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-amber-500 border border-[#22262B] flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm">
-                  {getInitials(user?.name || "Shashwath K")}
+                  {getInitials(user?.name || "Contractor")}
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-xs font-semibold text-[#F0F3F6] leading-none truncate">
-                    {user?.name || "Shashwath K."}
+                    {user?.name || "Contractor"}
                   </span>
                   <span className="text-[10px] text-[#8492A6] mt-0.5 truncate">
-                    {user?.email || "contractor@oncue.ai"}
+                    {user?.email || ""}
                   </span>
                 </div>
               </div>
@@ -234,14 +264,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <div className="pt-4 border-t border-[#22262B] flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-amber-500 flex items-center justify-center text-xs font-bold text-white">
-                    {getInitials(user?.name || "Shashwath K")}
+                    {getInitials(user?.name || "Contractor")}
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-medium text-[#F0F3F6]">
-                      {user?.name || "Shashwath K."}
+                      {user?.name || "Contractor"}
                     </span>
                     <span className="text-[10px] text-[#555E6C]">
-                      {user?.email || "contractor@oncue.ai"}
+                      {user?.email || ""}
                     </span>
                   </div>
                 </div>
@@ -277,20 +307,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {/* Top Right Utilities */}
             <div className="flex items-center gap-3 text-xs">
               <Link
-                href="/app/clients"
-                className="px-3 py-1.5 rounded-lg copper-cta text-white font-medium flex items-center gap-1.5 transition-all shadow-sm"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Add Client</span>
-              </Link>
-
-              <Link
                 href="/app/notifications"
                 className="p-2 text-[#8492A6] hover:text-[#F0F3F6] relative rounded-lg hover:bg-[#161A1D] transition-colors"
-                title="Notifications"
+                title={unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? "s" : ""}` : "Notifications"}
               >
                 <Bell className="w-4 h-4" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] absolute top-1.5 right-1.5" />
+                {unreadCount > 0 && (
+                  <span className="w-2 h-2 rounded-full bg-[#3B82F6] absolute top-1.5 right-1.5 ring-2 ring-[#0B0D0F]" />
+                )}
               </Link>
 
               {/* Prominent Dashboard Log Out Button */}

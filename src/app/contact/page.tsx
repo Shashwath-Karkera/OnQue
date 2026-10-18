@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { OncueBrand } from "@/components/brand/oncue-brand";
 import { SiteFooter } from "@/components/brand/site-footer";
@@ -14,11 +14,13 @@ import {
   Shield,
   MessageSquare,
   Sparkles,
+  LayoutDashboard,
 } from "lucide-react";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,6 +28,22 @@ export default function ContactPage() {
     tradeType: "General Contractor",
     message: "",
   });
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) {
+          setUser(data.user);
+          setFormData((prev) => ({
+            ...prev,
+            name: prev.name || data.user.name || "",
+            email: prev.email || data.user.email || "",
+          }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,24 +74,54 @@ export default function ContactPage() {
             </Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Link
-              href="/app"
-              className="text-sm font-medium text-[#A1A1AA] hover:text-[#F4F4F5] transition-colors px-3 py-1.5"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/app"
-              className="inline-flex items-center justify-center px-4 py-2 rounded-lg copper-cta text-white text-xs sm:text-sm font-medium transition-all shadow-sm"
-            >
-              Start Free
-            </Link>
+            {user ? (
+              <Link
+                href="/app"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg copper-cta text-white text-xs sm:text-sm font-medium transition-all shadow-sm"
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>Go to Dashboard</span>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/app"
+                  className="text-sm font-medium text-[#A1A1AA] hover:text-[#F4F4F5] transition-colors px-3 py-1.5"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/app"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg copper-cta text-white text-xs sm:text-sm font-medium transition-all shadow-sm"
+                >
+                  Start Free
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        {user && (
+          <div className="mb-8 p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5 text-[#F0F3F6]">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>
+                You are currently signed in as <span className="font-semibold text-white">{user.name}</span> ({user.email}).
+              </span>
+            </div>
+            <Link
+              href="/app/contact"
+              className="inline-flex items-center gap-1.5 text-blue-400 hover:text-blue-300 font-medium transition-colors underline"
+            >
+              <span>Open in-app Support Desk</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
+
         <div className="max-w-2xl mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#F0F3F6] mb-4 leading-tight">
             Get in touch with ONcue
@@ -275,7 +323,7 @@ export default function ContactPage() {
                   <div>
                     <div className="text-[11px] text-[#8492A6]">Support Hours</div>
                     <div className="text-[#F0F3F6]">
-                      Monday – Friday, 8:00 AM – 6:00 PM EST
+                      Monday - Friday, 8:00 AM - 6:00 PM EST
                     </div>
                     <div className="text-[10px] text-emerald-400 mt-0.5">
                       Submissions reviewed within 4 business hours

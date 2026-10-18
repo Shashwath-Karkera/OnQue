@@ -3,10 +3,12 @@ import { z } from "zod";
 import { checkRateLimit, generateOtp } from "@/lib/auth/security";
 import { saveOtp, findUserByEmail, writeAuditLog } from "@/lib/auth/user-store";
 import { sendOtpEmail } from "@/lib/email/mailer";
+import { query, isDatabaseConfigured } from "@/lib/db/neon";
 
 const ResendOtpSchema = z.object({
   email: z.string().email().trim().toLowerCase(),
   purpose: z.enum(["register", "login", "reset_password"]).default("register"),
+  name: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -26,7 +28,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { email, purpose } = parseResult.data;
+    const { email, purpose, name: passedName } = parseResult.data;
 
     // Strict cooldown: Only 1 resend per 60 seconds per email
     const cooldown = checkRateLimit(`resend_cd_${email}`, 1, 60 * 1000);
@@ -42,18 +44,44 @@ export async function POST(request: Request) {
 
     // Generate new OTP
     const newOtp = generateOtp();
+    let recipientName = passedName;
+    let pendingPayload: { name: string; password_hash: string } | undefined = undefined;
+
+    // Check existing registered user
     const user = await findUserByEmail(email);
+    if (user?.name) {
+      recipientName = user.name;
+    }
+
+    // If pending registration, preserve pending payload and extract recipient name
+    if (isDatabaseConfigured()) {
+      try {
+        const existingOtp = await query(
+          `SELECT pending_payload FROM otps WHERE LOWER(email) = $1 AND purpose = $2 AND pending_payload IS NOT NULL ORDER BY created_at DESC LIMIT 1`,
+          [email, purpose]
+        );
+        if (existingOtp.rows.length > 0 && existingOtp.rows[0].pending_payload) {
+          pendingPayload = existingOtp.rows[0].pending_payload;
+          if (!recipientName && pendingPayload?.name) {
+            recipientName = pendingPayload.name;
+          }
+        }
+      } catch (err) {
+        console.error("[Resend OTP error reading pending_payload]", err);
+      }
+    }
 
     await saveOtp({
       email,
       rawOtp: newOtp,
       purpose,
+      pendingPayload,
     });
 
     const emailResult = await sendOtpEmail(
       email,
       newOtp,
-      user?.name || "Valued Member"
+      recipientName
     );
 
     await writeAuditLog({

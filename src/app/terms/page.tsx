@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "Terms of Service — ONcue Payment Intelligence",
+  title: "Terms of Service | ONcue Payment Intelligence",
   description:
     "Terms of Service governing the use of ONcue contractor payment intelligence, credit risk evaluation, and milestone management tools.",
 };
@@ -106,7 +106,7 @@ const ARTICLES = [
           <p className="text-xs sm:text-sm text-[#F0F3F6] leading-relaxed">
             ONcue is NOT a consumer credit reporting agency under the Fair Credit
             Reporting Act (FCRA) or provincial equivalents. Payment reliability
-            scores (0–100) and risk indicators represent statistical evaluations
+            scores (0-100) and risk indicators represent statistical evaluations
             derived from user-recorded billing events and payment timelines.
           </p>
         </div>

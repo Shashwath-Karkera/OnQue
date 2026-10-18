@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ONcue — Know How a Client Pays Before You Start the Job",
+  title: "ONcue | Know How a Client Pays Before You Start the Job",
   description:
     "Payment intelligence platform for contractors and freelancers. Predict payment behavior, manage milestone schedules, and reduce risk before and during every project.",
   keywords: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "ONcue Intelligence" }],
   openGraph: {
-    title: "ONcue — Stop Chasing Payments. Start Making Smarter Decisions.",
+    title: "ONcue | Stop Chasing Payments. Start Making Smarter Decisions.",
     description:
       "Payment intelligence platform for contractors and freelancers. Predict payment behavior and protect your cash flow.",
     type: "website",

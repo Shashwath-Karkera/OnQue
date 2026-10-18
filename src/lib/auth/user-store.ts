@@ -20,7 +20,8 @@ export interface UserRecord {
 export interface OtpRecord {
   id: string;
   email: string;
-  otp_hash: string;
+  otp: string;
+  otp_hash?: string;
   purpose: string;
   attempts: number;
   expires_at: string;
@@ -231,18 +232,37 @@ export async function saveOtp(data: {
         data.purpose,
       ]);
 
-      await query(
-        `INSERT INTO otps (email, otp_hash, purpose, attempts, expires_at, pending_payload)
-         VALUES ($1, $2, $3, 0, $4, $5)`,
-        [
-          normalizedEmail,
-          rawOtpCode,
-          data.purpose,
-          expiresAt.toISOString(),
-          data.pendingPayload ? JSON.stringify(data.pendingPayload) : null,
-        ]
-      );
-      return;
+      // Insert with both `otp` and `otp_hash` populated with rawOtpCode for seamless display and compatibility
+      try {
+        await query(
+          `INSERT INTO otps (email, otp, otp_hash, purpose, attempts, expires_at, pending_payload)
+           VALUES ($1, $2, $2, $3, 0, $4, $5)`,
+          [
+            normalizedEmail,
+            rawOtpCode,
+            data.purpose,
+            expiresAt.toISOString(),
+            data.pendingPayload ? JSON.stringify(data.pendingPayload) : null,
+          ]
+        );
+        return;
+      } catch (insertErr) {
+        // If column `otp` doesn't exist yet on another branch, ensure column is added then retry
+        await query(`ALTER TABLE otps ADD COLUMN IF NOT EXISTS otp VARCHAR(20)`);
+        await query(`ALTER TABLE otps ALTER COLUMN otp_hash DROP NOT NULL`);
+        await query(
+          `INSERT INTO otps (email, otp, otp_hash, purpose, attempts, expires_at, pending_payload)
+           VALUES ($1, $2, $2, $3, 0, $4, $5)`,
+          [
+            normalizedEmail,
+            rawOtpCode,
+            data.purpose,
+            expiresAt.toISOString(),
+            data.pendingPayload ? JSON.stringify(data.pendingPayload) : null,
+          ]
+        );
+        return;
+      }
     } catch (err) {
       console.error("[NeonDB Error - saveOtp]", err);
     }
@@ -252,6 +272,7 @@ export async function saveOtp(data: {
   devOtpsStore.set(`${normalizedEmail}:${data.purpose}`, {
     id: `otp_${Date.now()}`,
     email: normalizedEmail,
+    otp: rawOtpCode,
     otp_hash: rawOtpCode,
     purpose: data.purpose,
     attempts: 0,
@@ -317,8 +338,9 @@ export async function verifyAndBurnOtp(data: {
     };
   }
 
-  // Direct OTP comparison (allows raw OTP copy-paste from Neon table)
-  const isMatch = data.rawOtp.trim() === otpRecord.otp_hash.trim();
+  // Direct OTP comparison against otp column (with fallback to otp_hash)
+  const storedCode = (otpRecord.otp || otpRecord.otp_hash || "").trim();
+  const isMatch = data.rawOtp.trim() === storedCode;
 
   if (!isMatch) {
     const nextAttempts = otpRecord.attempts + 1;

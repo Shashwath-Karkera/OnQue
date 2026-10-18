@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "About Us — ONcue Payment Intelligence",
+  title: "About Us | ONcue Payment Intelligence",
   description:
     "Why ONcue was founded: bringing payment transparency, objective reliability metrics, and cash flow protection to contractors.",
 };
@@ -182,11 +182,11 @@ export default function AboutPage() {
               <ul className="space-y-2.5 text-xs text-[#A1A1AA] pt-2">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  Empirical payment reliability scores (0–100) based on real records
+                  Empirical payment reliability scores (0-100) based on real records
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  Suggested upfront deposits (20%–35%) calibrated to client risk
+                  Suggested upfront deposits (20% to 35%) calibrated to client risk
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />

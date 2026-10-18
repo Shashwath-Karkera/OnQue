@@ -99,18 +99,11 @@ export default function LandingPage() {
         <section id="product-preview" className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
           <div className="rounded-2xl silver-card-elevated overflow-hidden">
             {/* Top window bar */}
-            <div className="h-10 px-4 bg-[#0A0A0D] border-b border-white/[0.08] flex items-center justify-between text-xs text-[#A1A1AA]">
+            <div className="h-10 px-4 bg-[#0A0A0D] border-b border-white/[0.08] flex items-center text-xs text-[#A1A1AA]">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
                 <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
                 <div className="w-2.5 h-2.5 rounded-full bg-white/20" />
-                <span className="ml-3 font-mono text-[11px] text-zinc-400 hidden sm:inline">
-                  app.oncue.io/clients/northstar-renovations
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-[11px] text-[#A1A1AA]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                Live Demo Profile
               </div>
             </div>
 
@@ -119,9 +112,6 @@ export default function LandingPage() {
               {/* Client Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
                 <div>
-                  <div className="text-xs font-mono text-[#A1A1AA] mb-1">
-                    Clients / Northstar Renovations
-                  </div>
                   <div className="flex items-center gap-3">
                     <h2 className="text-xl sm:text-2xl font-semibold text-[#F4F4F5]">
                       Northstar Renovations
@@ -131,7 +121,7 @@ export default function LandingPage() {
                     </span>
                   </div>
                   <p className="text-xs text-[#A1A1AA] mt-1">
-                    Commercial General Contractor · Toronto, ON · Active Client
+                    Commercial General Contractor · Toronto, ON · Active Account
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -351,7 +341,7 @@ export default function LandingPage() {
               <div className="font-mono text-xs font-bold text-zinc-300">STAGE 02</div>
               <h3 className="text-sm font-semibold text-[#F4F4F5]">Structure Terms</h3>
               <p className="text-xs text-[#A1A1AA] leading-relaxed">
-                Get recommended upfront deposit percentages (20%–35%) and Net windows calibrated to client risk.
+                Get recommended upfront deposit percentages (20% to 35%) and Net windows calibrated to client risk.
               </p>
             </div>
 

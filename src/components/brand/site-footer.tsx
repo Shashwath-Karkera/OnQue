@@ -76,10 +76,10 @@ export function SiteFooter() {
                 </li>
                 <li>
                   <Link
-                    href="/app/insights"
+                    href="/app/analytics"
                     className="text-[#8492A6] hover:text-[#F0F3F6] transition-colors"
                   >
-                    AI Risk Engine
+                    Financial Analytics
                   </Link>
                 </li>
               </ul>

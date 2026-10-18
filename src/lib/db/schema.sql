@@ -26,14 +26,15 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_email_lower ON users (LOWER(email));
 CREATE INDEX IF NOT EXISTS idx_users_provider ON users (auth_provider);
 
--- 2. OTP Verifications Table (Zero-knowledge: codes are SHA-256 hashed)
+-- 2. OTP Verifications Table (Stores 6-digit verification codes)
 CREATE TABLE IF NOT EXISTS otps (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) NOT NULL,
-    otp_hash VARCHAR(64) NOT NULL,             -- SHA-256 hash of the 6-digit OTP
+    otp VARCHAR(20) NOT NULL,                  -- 6-digit verification OTP code
+    otp_hash VARCHAR(64),                      -- Legacy / hash compatibility column
     purpose VARCHAR(50) NOT NULL,              -- 'register' | 'login' | 'reset_password'
     attempts INTEGER NOT NULL DEFAULT 0,       -- Maximum 5 attempts before burn
-    expires_at TIMESTAMP WITH TIME ZONE NOT NULL, -- 10 minute expiry window
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL, -- Expiry window
     pending_payload JSONB,                     -- Hashed password and profile payload stored securely until OTP verification
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );

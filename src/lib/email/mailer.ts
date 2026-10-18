@@ -15,9 +15,8 @@ function getTransporter(): Transporter | null {
   if (!isSmtpConfigured()) return null;
 
   if (!transporterInstance) {
-    const port = parseInt(process.env.SMTP_PORT || "587", 10);
-    const secure =
-      process.env.SMTP_SECURE === "true" || port === 465;
+    const port = parseInt(process.env.SMTP_PORT || "465", 10);
+    const secure = process.env.SMTP_SECURE === "true" || port === 465;
 
     transporterInstance = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -105,36 +104,51 @@ function generateOtpHtmlEmail(otp: string, recipientName: string = "User"): stri
 
 /**
  * Sends the 6-digit OTP code to the recipient email via SMTP.
+ * Always targets the recipient's name in both the envelope and body.
  */
 export async function sendOtpEmail(
   toEmail: string,
   otp: string,
-  recipientName: string = "Valued Member"
+  recipientName?: string
 ): Promise<{ success: boolean; messageId?: string; devMode?: boolean }> {
+  // Extract a clean name from the recipient email if not provided or generic
+  const rawEmailUser = toEmail.split("@")[0].replace(/[0-9._-]+/g, " ").trim();
+  const derivedName = rawEmailUser
+    ? rawEmailUser.replace(/\b\w/g, (c) => c.toUpperCase())
+    : "Valued Contractor";
+
+  const cleanRecipientName =
+    recipientName &&
+    recipientName.trim().length > 0 &&
+    recipientName !== "Valued Member" &&
+    recipientName !== "User"
+      ? recipientName.trim()
+      : derivedName;
+
   const transporter = getTransporter();
 
   if (!transporter) {
     console.log("\n" + "=".repeat(50));
-    console.log(`[ONcue OTP] Recipient: ${toEmail}`);
+    console.log(`[ONcue OTP] Recipient: ${cleanRecipientName} <${toEmail}>`);
     console.log(`[ONcue OTP] Code: ${otp} (Expires in 1 min)`);
     console.log("=".repeat(50) + "\n");
     return { success: true, devMode: true };
   }
 
-  const fromAddress =
-    process.env.SMTP_FROM || `"ONcue Security" <${process.env.SMTP_USER}>`;
+  const fromUser = process.env.SMTP_USER || "onque.connect@gmail.com";
+  const fromAddress = `"ONcue Security" <${fromUser}>`;
 
   const mailOptions = {
     from: fromAddress,
-    to: toEmail,
+    to: `"${cleanRecipientName}" <${toEmail}>`,
     subject: `${otp} is your ONcue verification code`,
-    text: `Your ONcue verification code is: ${otp}. It will expire in 1 minute.`,
-    html: generateOtpHtmlEmail(otp, recipientName),
+    text: `Hello ${cleanRecipientName},\n\nYour ONcue verification code is: ${otp}. It will expire in 1 minute.\n\nIf you did not request this code, you can safely ignore this email.`,
+    html: generateOtpHtmlEmail(otp, cleanRecipientName),
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log(`[ONcue Mailer] Verification email sent to ${toEmail}. Message ID: ${info.messageId}`);
+    console.log(`[ONcue Mailer] Verification email dispatched to ${cleanRecipientName} <${toEmail}>. Message ID: ${info.messageId}`);
     return {
       success: true,
       messageId: info.messageId,
@@ -142,7 +156,6 @@ export async function sendOtpEmail(
     };
   } catch (error: any) {
     console.error(`[ONcue Mailer Error] Failed to send email to ${toEmail}:`, error);
-    // Even if SMTP fails, print the code so developers aren't locked out in dev
     console.log(`[ONcue Mailer Emergency Fallback Code for ${toEmail}]: ${otp}`);
     throw new Error(`Email delivery failed: ${error.message}`);
   }

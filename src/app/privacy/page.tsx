@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "Privacy Policy — ONcue Payment Intelligence",
+  title: "Privacy Policy | ONcue Payment Intelligence",
   description:
     "How ONcue protects contractor confidentiality, secures trade payment records, and ensures zero data commercialization.",
 };
@@ -127,7 +127,7 @@ const SECTIONS = [
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <div>
               <strong className="text-[#F0F3F6] block text-xs sm:text-sm">
-                Compute Payment Reliability Scoring (0–100)
+                Compute Payment Reliability Scoring (0-100)
               </strong>
               <span className="text-xs text-[#8492A6]">
                 Analyzing historical settlement velocity against contractual Net
@@ -142,7 +142,7 @@ const SECTIONS = [
                 Calibrate Recommended Contract Terms
               </strong>
               <span className="text-xs text-[#8492A6]">
-                Recommending protective upfront deposit percentages (20%–35%)
+                Recommending protective upfront deposit percentages (20% to 35%)
                 and milestone gating to prevent unrecoverable out-of-pocket
                 material exposure.
               </span>
