@@ -353,8 +353,9 @@ export function AuthContainer({ initialMode = "login" }: AuthContainerProps) {
         code === "auth/unauthorized-domain" ||
         msg.includes("unauthorized-domain")
       ) {
+        const currentHost = typeof window !== "undefined" ? window.location.hostname : "your domain";
         setErrorMessage(
-          "This domain is not authorized in Firebase Console. Add 'localhost' under Authentication > Settings > Authorized domains."
+          `This domain (${currentHost}) is not authorized in Firebase Console. Go to Firebase Console > Authentication > Settings > Authorized domains and add '${currentHost}'.`
         );
       } else if (code === "auth/cancelled-popup-request") {
         // User triggered another popup before previous completed
